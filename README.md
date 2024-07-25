@@ -15,8 +15,7 @@ You'll need to have this software installed before carrying on:
 ```shell
 apt-get update -qq -y
 apt-get upgrade -qq -y
-apt-get install -qq -y git python3
-apt-get install pipx
+apt-get install git python3 pipx
 pipx ensurepath
 source ~/.bashrc
 ```
