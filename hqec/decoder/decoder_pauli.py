@@ -5,6 +5,7 @@ import os
 import psutil
 import random
 
+from gurobipy import GRB, Model, or_, and_
 from hqec.decoder.mod2_algebra import (
     find_kj_that_anticommutes_with_jth_row_only,
     find_zero_columns_in_pairs,
@@ -23,7 +24,6 @@ from hqec.operator_push.push_toolbox import push_operator
 from hqec.operator_push.export_toolbox import extract_tensor_info
 from hqec.operator_push.tensor_toolbox import get_tensor_from_id
 from multiprocessing import Process, Queue, Pool
-from gurobipy import GRB, Model, or_, and_
 
 
 def minimize_error_operator_weight(
@@ -290,8 +290,12 @@ def calculate_syndrome(stabilizer_matrix, pauli_error_vector):
 # print(syndrome_vector)
 
 
-def decoding_process(queue, px, py, pz, stabilizers, stabilizer_matrix, stabilizers_and_logical, f, n, time_limit,
-                     mip_focus, heuristics, output_flag):
+def decoding_process(
+    queue,
+    px, py, pz,
+    stabilizers, stabilizer_matrix, stabilizers_and_logical,
+    f, n, time_limit, mip_focus, heuristics, output_flag
+):
     try:
         # Generate a random Pauli error vector
         e_0 = generate_pauli_error_vector(px, py, pz, n)
@@ -324,8 +328,12 @@ def decoding_process(queue, px, py, pz, stabilizers, stabilizer_matrix, stabiliz
         queue.put(False)
 
 
-def decoding_iteration(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix, stabilizers_and_logical, f, n,
-                       time_limit, mip_focus, heuristics, output_flag, affinity=None, pass_all_info=False):
+def decoding_iteration(
+    px, py, pz,
+    stabilizers_and_other_logs, stabilizer_matrix, stabilizers_and_logical,
+    f, n,
+    time_limit, mip_focus, heuristics, output_flag, affinity=None, pass_all_info=False
+):
     try:
         # Set CPU affinity for the process if specified
         if affinity is not None:
@@ -379,10 +387,14 @@ def decoding_iteration(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix
         return False
 
 
-def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logical_xs, logical_zs, logical_x,
-                                                  logical_z, px, py, pz, N, n_process, cpu_affinity_list=None,
-                                                  time_limit=None, mip_focus=0, heuristics=0, output_flag=0, f=None,
-                                                  pass_all_info=False):
+def quantum_error_correction_decoder_multiprocess(
+    tensor_list,
+    stabilizers, logical_xs, logical_zs, logical_x, logical_z,
+    px, py, pz,
+    N,
+    n_process, cpu_affinity_list=None, time_limit=None,
+    mip_focus=0, heuristics=0, output_flag=0, f=None, pass_all_info=False
+):
     stabilizers_binary = batch_convert_to_binary_vectors(stabilizers)
     logical_xs_binary = batch_convert_to_binary_vectors(logical_xs)
     logical_zs_binary = batch_convert_to_binary_vectors(logical_zs)
@@ -408,13 +420,17 @@ def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logi
     return success_rate
 
 
-# 使用方法
 # success_rate = quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logical_xs, logical_zs, px, py, pz, N, n_process)
 # print(f"Decoding success rate: {success_rate}")
 
 
-def quantum_error_correction_decoder(tensor_list, stabilizers, logical_xs, logical_zs, px, py, pz, N,
-                                     time_limit=None, mip_focus=0, heuristics=0, output_flag=0):
+def quantum_error_correction_decoder(
+    tensor_list,
+    stabilizers, logical_xs, logical_zs,
+    px, py, pz,
+    N,
+    time_limit=None, mip_focus=0, heuristics=0, output_flag=0
+):
     # Convert stabilizers and logical operators to binary vectors
     stabilizers_binary = batch_convert_to_binary_vectors(stabilizers)
     logical_xs_binary = batch_convert_to_binary_vectors(logical_xs)
@@ -487,23 +503,6 @@ def is_error_equivalent(stabilizers, e_0, e_bar):
             return False  # Found a row indicating no solution
 
     return True  # No such row found, recovery is possible
-
-
-def calculate_pauli_weight(pauli_string):
-    """
-    Calculate the weight of a Pauli operator string.
-
-    Args:
-    pauli_string (str): A string of Pauli operators (I, X, Z, Y).
-
-    Returns:
-    int: The weight of the Pauli string (number of non-I operators).
-    """
-    weight = 0
-    for char in pauli_string:
-        if char != 'I':
-            weight += 1
-    return weight
 
 # Example
 # pauli_string = 'IIXXZYXI'

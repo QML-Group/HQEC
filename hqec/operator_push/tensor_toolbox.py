@@ -3,7 +3,7 @@ import numpy as np
 import os
 import tempfile
 
-from hqec.decoder.decoder_pauli import calculate_pauli_weight
+from hqec.decoder.pauli import calculate_pauli_weight
 from hqec.operator_processor import (
     batch_convert_to_binary_vectors,
     binary_vector_to_pauli,
