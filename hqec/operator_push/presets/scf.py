@@ -1,5 +1,11 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor, has_logical
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import (
+    Tensor,
+    add_logical_legs,
+    ensure_minimum_legs,
+    get_tensor_from_id,
+    has_logical,
+)
 
 
 def setup_max_rate_scf(R):
@@ -32,26 +38,26 @@ def setup_max_rate_scf(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define UPS generators
-    UPSa1 = 'IXXIXI'
-    UPSa2 = 'XIIXXI'
-    UPSa3 = 'IZIZZI'
-    UPSa4 = 'ZIZIZI'
-    UPSa5 = 'IXIXIX'
-    UPSa6 = 'ZIIZIZ'
+    UPSa1 = "IXXIXI"
+    UPSa2 = "XIIXXI"
+    UPSa3 = "IZIZZI"
+    UPSa4 = "ZIZIZI"
+    UPSa5 = "IXIXIX"
+    UPSa6 = "ZIIZIZ"
 
-    UPSb1 = 'IXXIXI'
-    UPSb2 = 'XIIXXI'
-    UPSb3 = 'IZIZZI'
-    UPSb4 = 'ZIZIZI'
-    UPSb5 = 'IXIXIX'
-    UPSb6 = 'IIZZZZ'
+    UPSb1 = "IXXIXI"
+    UPSb2 = "XIIXXI"
+    UPSb3 = "IZIZZI"
+    UPSb4 = "ZIZIZI"
+    UPSb5 = "IXIXIX"
+    UPSb6 = "IIZZZZ"
 
-    UPSc1 = 'IXXIXI'
-    UPSc2 = 'XIIXXI'
-    UPSc3 = 'IZIZZI'
-    UPSc4 = 'ZIZIZI'
-    UPSc5 = 'IIXXXX'
-    UPSc6 = 'IIZZZZ'
+    UPSc1 = "IXXIXI"
+    UPSc2 = "XIIXXI"
+    UPSc3 = "IZIZZI"
+    UPSc4 = "ZIZIZI"
+    UPSc5 = "IIXXXX"
+    UPSc6 = "IIZZZZ"
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -105,8 +111,12 @@ def setup_zero_rate_scf(R):
 
     for i, current_layer_tensor_id_list in enumerate(layer_list):
         # Ensure Minimum Legs to 6 for tensors in this layer
-        ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=6, start_idx=current_layer_tensor_id_list[0],
-                            end_idx=current_layer_tensor_id_list[-1] + 1)
+        ensure_minimum_legs(
+            tensor_list=tensor_list,
+            target_leg_number=6,
+            start_idx=current_layer_tensor_id_list[0],
+            end_idx=current_layer_tensor_id_list[-1] + 1,
+        )
 
     # Ensure Minimum Legs to 5 for tensor 0
     ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=5, start_idx=0, end_idx=1)
@@ -117,33 +127,33 @@ def setup_zero_rate_scf(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define UPS generators
-    UPSa1 = 'IXXIXI'
-    UPSa2 = 'XIIXXI'
-    UPSa3 = 'IZIZZI'
-    UPSa4 = 'ZIZIZI'
-    UPSa5 = 'IXIXIX'
-    UPSa6 = 'ZIIZIZ'
+    UPSa1 = "IXXIXI"
+    UPSa2 = "XIIXXI"
+    UPSa3 = "IZIZZI"
+    UPSa4 = "ZIZIZI"
+    UPSa5 = "IXIXIX"
+    UPSa6 = "ZIIZIZ"
 
-    UPSb1 = 'IXXIXI'
-    UPSb2 = 'XIIXXI'
-    UPSb3 = 'IZIZZI'
-    UPSb4 = 'ZIZIZI'
-    UPSb5 = 'IXIXIX'
-    UPSb6 = 'IIZZZZ'
+    UPSb1 = "IXXIXI"
+    UPSb2 = "XIIXXI"
+    UPSb3 = "IZIZZI"
+    UPSb4 = "ZIZIZI"
+    UPSb5 = "IXIXIX"
+    UPSb6 = "IIZZZZ"
 
-    UPSc1 = 'IXXIXI'
-    UPSc2 = 'XIIXXI'
-    UPSc3 = 'IZIZZI'
-    UPSc4 = 'ZIZIZI'
-    UPSc5 = 'IIXXXX'
-    UPSc6 = 'IIZZZZ'
+    UPSc1 = "IXXIXI"
+    UPSc2 = "XIIXXI"
+    UPSc3 = "IZIZZI"
+    UPSc4 = "ZIZIZI"
+    UPSc5 = "IIXXXX"
+    UPSc6 = "IIZZZZ"
 
-    UPSd1 = 'IIXXIX'
-    UPSd2 = 'IXIIXX'
-    UPSd3 = 'IIZIZZ'
-    UPSd4 = 'IZIZIZ'
-    UPSd5 = 'XIXIXI'
-    UPSd6 = 'ZIIZZZ'
+    UPSd1 = "IIXXIX"
+    UPSd2 = "IXIIXX"
+    UPSd3 = "IIZIZZ"
+    UPSd4 = "IZIZIZ"
+    UPSd5 = "XIXIXI"
+    UPSd6 = "ZIIZZZ"
 
     # Assign UPS to tensors
     for tensor in tensor_list:

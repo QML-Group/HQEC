@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_happy_plus_rm_zero(R):
@@ -22,7 +22,9 @@ def setup_happy_plus_rm_zero(R):
         layer_list.append(r1)
         for i, R_num in enumerate(range(2, R + 1)):
             if i % 2 == 0:
-                temp = create_layer_q4(tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=16)
+                temp = create_layer_q4(
+                    tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=16
+                )
             else:
                 temp = create_layer_q4(tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=6)
             layer_list.append(temp)
@@ -30,12 +32,20 @@ def setup_happy_plus_rm_zero(R):
     for i, current_layer_tensor_id_list in enumerate(layer_list):
         if i % 2 == 0:
             # Ensure Minimum Legs to 16 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=16, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=16,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
         else:
             # Ensure Minimum Legs to 6 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=6, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=6,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
 
     # Add Logical
     add_logical_legs(tensor_list=tensor_list, start_idx=0, end_idx=1)
@@ -107,24 +117,40 @@ def setup_happy_plus_rm_zero(R):
     upsc15 = "IIXXIIXXIIXXIIXX"
     upsc16 = "IIZZIIZZIIZZIIZZ"
 
-
     # Define happy UPS generators
-    hUPSa1 = 'XZZXII'
-    hUPSa2 = 'IXZZXI'
-    hUPSa3 = 'XIXZZI'
-    hUPSa4 = 'ZXIXZI'
-    hUPSa5 = 'XXXXXX'
-    hUPSa6 = 'ZZZZZZ'
+    hUPSa1 = "XZZXII"
+    hUPSa2 = "IXZZXI"
+    hUPSa3 = "XIXZZI"
+    hUPSa4 = "ZXIXZI"
+    hUPSa5 = "XXXXXX"
+    hUPSa6 = "ZZZZZZ"
 
-    UPSb1 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSb2 = ['I', 'I', 'X', 'Z', 'Z', 'X']
-    UPSb3 = ['I', 'X', 'I', 'X', 'Z', 'Z']
-    UPSb4 = ['I', 'Z', 'X', 'I', 'X', 'Z']
-    UPSb5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSb6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSb1 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSb2 = ["I", "I", "X", "Z", "Z", "X"]
+    UPSb3 = ["I", "X", "I", "X", "Z", "Z"]
+    UPSb4 = ["I", "Z", "X", "I", "X", "Z"]
+    UPSb5 = ["X", "X", "X", "X", "X", "X"]
+    UPSb6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    ul = ['IIXZZX', 'IIZYYZ', 'IZXXIZ', 'IXIZXZ', 'IYXYXI', 'ZIZXIX', 'XIZZXI', 'YIIYXX', 'ZZYIIY', 'ZXZYXY', 'ZYYZXX',
-          'XZYYXZ', 'YZXZXY', 'XXZIIZ', 'XYYXII', 'YXIXIY', 'YYXIIX']
+    ul = [
+        "IIXZZX",
+        "IIZYYZ",
+        "IZXXIZ",
+        "IXIZXZ",
+        "IYXYXI",
+        "ZIZXIX",
+        "XIZZXI",
+        "YIIYXX",
+        "ZZYIIY",
+        "ZXZYXY",
+        "ZYYZXX",
+        "XZYYXZ",
+        "YZXZXY",
+        "XXZIIZ",
+        "XYYXII",
+        "YXIXIY",
+        "YYXIIX",
+    ]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -144,10 +170,41 @@ def setup_happy_plus_rm_zero(R):
             if len(upper_neighbors) == 1:
                 # Rule 2
                 if current_layer % 2 == 1:
-                    tensor.ups_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10, upsb11,
-                                       upsb12, upsb13, upsb14, upsb15, upsb16, upsb17]
-                    tensor.stabilizer_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10,
-                                              upsb11, upsb12, upsb13, upsb14]
+                    tensor.ups_list = [
+                        upsb1,
+                        upsb2,
+                        upsb3,
+                        upsb4,
+                        upsb5,
+                        upsb6,
+                        upsb7,
+                        upsb8,
+                        upsb9,
+                        upsb10,
+                        upsb11,
+                        upsb12,
+                        upsb13,
+                        upsb14,
+                        upsb15,
+                        upsb16,
+                        upsb17,
+                    ]
+                    tensor.stabilizer_list = [
+                        upsb1,
+                        upsb2,
+                        upsb3,
+                        upsb4,
+                        upsb5,
+                        upsb6,
+                        upsb7,
+                        upsb8,
+                        upsb9,
+                        upsb10,
+                        upsb11,
+                        upsb12,
+                        upsb13,
+                        upsb14,
+                    ]
                 else:
                     tensor.ups_list = [UPSb1, UPSb2, UPSb3, UPSb4, UPSb5, UPSb6]
                     tensor.stabilizer_list = [UPSb1, UPSb2, UPSb3, UPSb4]
@@ -156,11 +213,50 @@ def setup_happy_plus_rm_zero(R):
             elif len(upper_neighbors) == 2:
                 # Rule 3
                 if current_layer % 2 == 1:
-                    tensor.ups_list = [upsc1, upsc2, upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc11,
-                                       upsc12, upsc13, upsc14, upsc15, upsc16, upsc1y, upsc2y, upsc3y, upscz, upscx,
-                                       upscyz, upsczx, upscyx, upsczy, upscxy, upscxy, upscxz]
-                    tensor.stabilizer_list = [upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc13, upsc14,
-                                              upsc15, upsc16]
+                    tensor.ups_list = [
+                        upsc1,
+                        upsc2,
+                        upsc3,
+                        upsc4,
+                        upsc5,
+                        upsc6,
+                        upsc7,
+                        upsc8,
+                        upsc9,
+                        upsc10,
+                        upsc11,
+                        upsc12,
+                        upsc13,
+                        upsc14,
+                        upsc15,
+                        upsc16,
+                        upsc1y,
+                        upsc2y,
+                        upsc3y,
+                        upscz,
+                        upscx,
+                        upscyz,
+                        upsczx,
+                        upscyx,
+                        upsczy,
+                        upscxy,
+                        upscxy,
+                        upscxz,
+                    ]
+                    tensor.stabilizer_list = [
+                        upsc3,
+                        upsc4,
+                        upsc5,
+                        upsc6,
+                        upsc7,
+                        upsc8,
+                        upsc9,
+                        upsc10,
+                        upsc13,
+                        upsc14,
+                        upsc15,
+                        upsc16,
+                    ]
                 else:
                     tensor.ups_list = ul
                     tensor.stabilizer_list = [ul[0], ul[1]]

@@ -1,22 +1,21 @@
 import numpy as np
-
 from gurobipy import GRB, Model, or_
 
 
 def pauli_product(operator_list):
-    product = 'I'
+    product = "I"
     for i in range(len(operator_list)):
         product = pairwise_pauli_product(product, operator_list[i])
     return product
 
 
 def pairwise_pauli_product(operator1, operator2):
-    if (operator1 not in ['I', 'X', 'Y', 'Z']) or (operator2 not in ['I', 'X', 'Y', 'Z']):
+    if (operator1 not in ["I", "X", "Y", "Z"]) or (operator2 not in ["I", "X", "Y", "Z"]):
         print("None Pauli Operator Error")
         return
-    product_table = [['I', 'X', 'Y', 'Z'], ['X', 'I', 'Z', 'Y'], ['Y', 'Z', 'I', 'X'], ['Z', 'Y', 'X', 'I']]
+    product_table = [["I", "X", "Y", "Z"], ["X", "I", "Z", "Y"], ["Y", "Z", "I", "X"], ["Z", "Y", "X", "I"]]
     # Convert Operator1 and Operator2 into indices and get output
-    operator_to_index = ['I', 'X', 'Y', 'Z']
+    operator_to_index = ["I", "X", "Y", "Z"]
     product = product_table[operator_to_index.index(operator1)][operator_to_index.index(operator2)]
     return product
 
@@ -31,22 +30,22 @@ def elementwise_product(list1, list2):
 
     # Define the multiplication rule for Pauli operators
     product_table = {
-        ('I', 'I'): 'I',
-        ('I', 'X'): 'X',
-        ('I', 'Y'): 'Y',
-        ('I', 'Z'): 'Z',
-        ('X', 'I'): 'X',
-        ('X', 'X'): 'I',
-        ('X', 'Y'): 'Z',
-        ('X', 'Z'): 'Y',
-        ('Y', 'I'): 'Y',
-        ('Y', 'X'): 'Z',
-        ('Y', 'Y'): 'I',
-        ('Y', 'Z'): 'X',
-        ('Z', 'I'): 'Z',
-        ('Z', 'X'): 'Y',
-        ('Z', 'Y'): 'X',
-        ('Z', 'Z'): 'I',
+        ("I", "I"): "I",
+        ("I", "X"): "X",
+        ("I", "Y"): "Y",
+        ("I", "Z"): "Z",
+        ("X", "I"): "X",
+        ("X", "X"): "I",
+        ("X", "Y"): "Z",
+        ("X", "Z"): "Y",
+        ("Y", "I"): "Y",
+        ("Y", "X"): "Z",
+        ("Y", "Y"): "I",
+        ("Y", "Z"): "X",
+        ("Z", "I"): "Z",
+        ("Z", "X"): "Y",
+        ("Z", "Y"): "X",
+        ("Z", "Z"): "I",
     }
 
     # Multiply element-wise and add the result to the result list
@@ -57,10 +56,10 @@ def elementwise_product(list1, list2):
 
 
 def pauli_flip(operator):
-    if operator == 'X':
-        return 'Z'
-    if operator == 'Z':
-        return 'X'
+    if operator == "X":
+        return "Z"
+    if operator == "Z":
+        return "X"
     return operator
 
 
@@ -74,7 +73,7 @@ def multiply_ups(ups_list, power_list):
     ups_length = len(ups_list[0])
 
     # Initialize the result as a list of all 'I'
-    result = ['I'] * ups_length
+    result = ["I"] * ups_length
 
     # Process each ups and its corresponding exponent.
     for ups, power in zip(ups_list, power_list):
@@ -90,14 +89,14 @@ def traverse_ups_powers(ups_list):
     ups_length = len(ups_list)
 
     # Calculate the total possible power values.
-    total_possibilities = 2 ** ups_length
+    total_possibilities = 2**ups_length
 
     results = []  # Initialize an empty list to store the results.
     power_lists = []
 
     # Iterate through each possible power value.
     for power in range(total_possibilities):
-        power_list = [int(bit) for bit in format(power, f'0{ups_length}b')]
+        power_list = [int(bit) for bit in format(power, f"0{ups_length}b")]
         result = multiply_ups(ups_list, power_list)
         results.append(result)  # Append the result to the list.
         power_lists.append(power_list)
@@ -133,6 +132,8 @@ def find_minimum_weight_representation_legacy(original_ups, stabilizer_generator
             lowest_weight = current_weight
             minimum_weight_ups = current_ups
     return minimum_weight_ups
+
+
 # The legacy one is too expensive for mem
 
 
@@ -149,11 +150,11 @@ def find_minimum_weight_representation(original_ups, stabilizer_generators):
     ups_length = len(stabilizer_generators)
 
     # Calculate the total possible power values.
-    total_possibilities = 2 ** ups_length
+    total_possibilities = 2**ups_length
 
     # Iterate through each possible power value.
     for power in range(total_possibilities):
-        power_list = [int(bit) for bit in format(power, f'0{ups_length}b')]
+        power_list = [int(bit) for bit in format(power, f"0{ups_length}b")]
         current_stabilizer = multiply_ups(stabilizer_generators, power_list)
         current_ups = elementwise_product(current_stabilizer, original_ups)
         current_weight = count_non_i_operator_num(current_ups)
@@ -161,8 +162,16 @@ def find_minimum_weight_representation(original_ups, stabilizer_generators):
             lowest_weight = current_weight
             minimum_weight_ups = current_ups
             selected_power = power
-            print("lowest_weight: ", lowest_weight, "power: ", power_list, "\ncurrent_stabilizer", current_stabilizer,
-                  "\ncurrent_ups: ", current_ups)
+            print(
+                "lowest_weight: ",
+                lowest_weight,
+                "power: ",
+                power_list,
+                "\ncurrent_stabilizer",
+                current_stabilizer,
+                "\ncurrent_ups: ",
+                current_ups,
+            )
     return minimum_weight_ups, lowest_weight, selected_power
 
 
@@ -219,7 +228,7 @@ def bit_distance(interested_tensor_id, pushed_results):
         tensor_result = pushed_results[tensor_id]
         for tensor_ups_result in tensor_result.values():
             if not tensor_ups_result["logical"]:
-                stabilizer_generator_list_of_all_tensor.append(tensor_ups_result['result'])
+                stabilizer_generator_list_of_all_tensor.append(tensor_ups_result["result"])
     print("len of stabilizer_generator_list_of_all_tensor: ", len(stabilizer_generator_list_of_all_tensor))
 
     # Evaluate distance for each logical operations of interested tensor
@@ -228,7 +237,8 @@ def bit_distance(interested_tensor_id, pushed_results):
     selected_powers = []
     for interested_tensors_logical_operator in interested_tensors_logical_operators:
         minimum_weight_ups, lowest_weight, selected_power = find_minimum_weight_representation(
-            interested_tensors_logical_operator, stabilizer_generator_list_of_all_tensor)
+            interested_tensors_logical_operator, stabilizer_generator_list_of_all_tensor
+        )
         minimum_weight_ups_list.append(minimum_weight_ups)
         distances.append(lowest_weight)
         selected_powers.append(selected_power)
@@ -260,7 +270,7 @@ def bit_distance_by_layer(interested_tensor_id, pushed_results, tensor_list):
         if tensor_id in pushed_results:
             for result in pushed_results[tensor_id].values():
                 if not result["logical"]:
-                    stabilizer_generators_by_layer.setdefault(layer, []).append(result['result'])
+                    stabilizer_generators_by_layer.setdefault(layer, []).append(result["result"])
 
     # Sort the dictionary by layer so we can process in order
     sorted_layers = sorted(stabilizer_generators_by_layer.keys())
@@ -278,8 +288,7 @@ def bit_distance_by_layer(interested_tensor_id, pushed_results, tensor_list):
             print("layer", layer, "stabilizer_generators", stabilizer_generators)
 
             # Compute distance using generators of this layer
-            ups, weight, power = find_approximate_minimum_weight_representation(
-                best_ups, stabilizer_generators)
+            ups, weight, power = find_approximate_minimum_weight_representation(best_ups, stabilizer_generators)
 
             if weight < best_weight:
                 best_weight = weight
@@ -287,40 +296,38 @@ def bit_distance_by_layer(interested_tensor_id, pushed_results, tensor_list):
                 best_power = power
 
             # result for this layer, save it
-            best_results_per_layer.append({
-                'logical operator': logical_id,
-                'layer': layer,
-                'weight': best_weight,
-                'ups': best_ups,
-                'power': best_power
-            })
+            best_results_per_layer.append(
+                {
+                    "logical operator": logical_id,
+                    "layer": layer,
+                    "weight": best_weight,
+                    "ups": best_ups,
+                    "power": best_power,
+                }
+            )
 
     # Output the best results per layer
     for result in best_results_per_layer:
-        print(f"logical operator {result['logical operator']} \nLayer {result['layer']}: "
-              f"Weight {result['weight']}, UPS {result['ups']}, "
-              f"Power {result['power']}")
+        print(
+            f"logical operator {result['logical operator']} \nLayer {result['layer']}: "
+            f"Weight {result['weight']}, UPS {result['ups']}, "
+            f"Power {result['power']}"
+        )
+
 
 # Example usage:
 # bit_distance(interested_tensor_id, pushed_results, tensor_list)
 
 
 def minimize_operator_weight(
-    op,
-    stabilizers,
-    punish_index_list=None,
-    punishment=1,
-    time_limit=None,
-    mip_focus=0,
-    heuristics=0,
-    output_flag=0
+    op, stabilizers, punish_index_list=None, punishment=1, time_limit=None, mip_focus=0, heuristics=0, output_flag=0
 ):
     # Create model
     model = Model("minimize_logical_operator_weight")
 
-    model.setParam('NodefileStart', 32)  # GB
+    model.setParam("NodefileStart", 32)  # GB
 
-    model.setParam('OutputFlag', output_flag)
+    model.setParam("OutputFlag", output_flag)
 
     # Set parameters
     if time_limit is not None:
@@ -355,8 +362,11 @@ def minimize_operator_weight(
     print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", punish_index_list)
     if punish_index_list:
         print("PPPPPPPPPPPPPPPPP")
-        model.setObjective(sum(punishment * v[i] for i in range(half_l) if i in punish_index_list) +
-                           sum(v[i] for i in range(half_l) if i not in punish_index_list), GRB.MINIMIZE)
+        model.setObjective(
+            sum(punishment * v[i] for i in range(half_l) if i in punish_index_list)
+            + sum(v[i] for i in range(half_l) if i not in punish_index_list),
+            GRB.MINIMIZE,
+        )
     else:
         model.setObjective(sum(v[i] for i in range(half_l)), GRB.MINIMIZE)
 
@@ -366,12 +376,12 @@ def minimize_operator_weight(
     # Print the results.
     if bool(output_flag):
         for var in lambda_vars.values():
-            print(f'{var.varName} = {var.x}')
-        print(f'Weight (wt) of the new logical operator: {model.objVal}')
+            print(f"{var.varName} = {var.x}")
+        print(f"Weight (wt) of the new logical operator: {model.objVal}")
         if model.status == GRB.OPTIMAL:
             print("OPTIMAL")
         else:
-            print('No optimal solution found')
+            print("No optimal solution found")
 
     # Return lambda values
     lambda_values = [var.x for var in lambda_vars.values()]

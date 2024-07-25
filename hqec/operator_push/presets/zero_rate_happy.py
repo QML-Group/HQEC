@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_zero_rate_happy(R):
@@ -32,27 +32,26 @@ def setup_zero_rate_happy(R):
     assign_layers_to_tensors(tensor_list, 0)
 
     # Define UPS generators
-    UPSa1 = ['X', 'Z', 'Z', 'X', 'I', 'I']
-    UPSa2 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSa3 = ['X', 'I', 'X', 'Z', 'Z', 'I']
-    UPSa4 = ['Z', 'X', 'I', 'X', 'Z', 'I']
-    UPSa5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSa6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSa1 = ["X", "Z", "Z", "X", "I", "I"]
+    UPSa2 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSa3 = ["X", "I", "X", "Z", "Z", "I"]
+    UPSa4 = ["Z", "X", "I", "X", "Z", "I"]
+    UPSa5 = ["X", "X", "X", "X", "X", "X"]
+    UPSa6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSb1 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSb2 = ['I', 'I', 'X', 'Z', 'Z', 'X']
-    UPSb3 = ['I', 'X', 'I', 'X', 'Z', 'Z']
-    UPSb4 = ['I', 'Z', 'X', 'I', 'X', 'Z']
-    UPSb5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSb6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSb1 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSb2 = ["I", "I", "X", "Z", "Z", "X"]
+    UPSb3 = ["I", "X", "I", "X", "Z", "Z"]
+    UPSb4 = ["I", "Z", "X", "I", "X", "Z"]
+    UPSb5 = ["X", "X", "X", "X", "X", "X"]
+    UPSb6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSc1 = ['I', 'I', 'X', 'Z', 'Z', 'X']
-    UPSc2 = ['I', 'I', 'Y', 'X', 'X', 'Y']
-    UPSc3 = ['I', 'X', 'I', 'Z', 'X', 'Z']
-    UPSc4 = ['I', 'Z', 'X', 'X', 'I', 'Z']
-    UPSc5 = ['X', 'I', 'Z', 'Z', 'X', 'I']
-    UPSc6 = ['Z', 'I', 'Z', 'X', 'I', 'X']
-
+    UPSc1 = ["I", "I", "X", "Z", "Z", "X"]
+    UPSc2 = ["I", "I", "Y", "X", "X", "Y"]
+    UPSc3 = ["I", "X", "I", "Z", "X", "Z"]
+    UPSc4 = ["I", "Z", "X", "X", "I", "Z"]
+    UPSc5 = ["X", "I", "Z", "Z", "X", "I"]
+    UPSc6 = ["Z", "I", "Z", "X", "I", "X"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:

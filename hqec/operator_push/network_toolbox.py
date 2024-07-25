@@ -1,5 +1,6 @@
 from collections import deque
-from hqec.operator_push.tensor_toolbox import get_tensor_from_id, connect_tensors, swap_tensor_legs
+
+from hqec.operator_push.tensor_toolbox import connect_tensors, get_tensor_from_id, swap_tensor_legs
 
 
 def create_layer_q4(tensor_list, previous_layer_id_list, legs_per_tensor):
@@ -17,7 +18,7 @@ def create_layer_q4(tensor_list, previous_layer_id_list, legs_per_tensor):
             if target_id not in tensor_id_of_this_layer:
                 tensor_id_of_this_layer.append(target_id)
         # Execute the connections
-        for (tensor_a, tensor_b) in tensor_connections:
+        for tensor_a, tensor_b in tensor_connections:
             connect_tensors(tensor_list, tensor_a, tensor_b)
     else:
         for i, previous_layer_tensor_id in enumerate(previous_layer_id_list):
@@ -38,7 +39,7 @@ def create_layer_q4(tensor_list, previous_layer_id_list, legs_per_tensor):
                 tensor_connections[(previous_layer_tensor_id, start_id)] = True
             target_id -= 1
         # Execute the connections
-        for (tensor_a, tensor_b) in tensor_connections:
+        for tensor_a, tensor_b in tensor_connections:
             connect_tensors(tensor_list, tensor_a, tensor_b)
 
         # Swap leg 0 and 1 for the first tensor of this layer
@@ -77,6 +78,7 @@ def assign_layers_to_tensors(tensor_list, center_tensor_id=0):
                 # Add the neighbor to the queue for further processing
                 queue.append(neighbor_id)
 
+
 # Assuming each tensor has a .get_connections() method that returns the list of connected tensor IDs
 # Example usage:
 # assign_layers_to_tensors(tensor_list, center_tensor_id=0)
@@ -93,6 +95,7 @@ def get_tensors_by_layer(tensor_list, layer_number):
 
     # Return the collected list of tensor IDs
     return tensor_ids_at_layer
+
 
 # Assuming each tensor object has a .layer attribute
 # Example usage:

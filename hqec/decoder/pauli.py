@@ -10,6 +10,6 @@ def calculate_pauli_weight(pauli_string):
     """
     weight = 0
     for char in pauli_string:
-        if char != 'I':
+        if char != "I":
             weight += 1
     return weight

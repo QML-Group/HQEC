@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_zero_rate_713(R):
@@ -35,31 +35,30 @@ def setup_zero_rate_713(R):
     assign_layers_to_tensors(tensor_list, 0)
 
     # Define UPS generators
-    UPSa1 = 'XZIZXIII'
-    UPSa2 = 'IXZIZXII'
-    UPSa3 = 'IIXZIZXI'
-    UPSa4 = 'XIIXZIZI'
-    UPSa5 = 'ZXIIXZII'
-    UPSa6 = 'IZXIIXZI'
-    UPSa7 = 'XXXXXXXX'
-    UPSa8 = 'ZZZZZZZZ'
+    UPSa1 = "XZIZXIII"
+    UPSa2 = "IXZIZXII"
+    UPSa3 = "IIXZIZXI"
+    UPSa4 = "XIIXZIZI"
+    UPSa5 = "ZXIIXZII"
+    UPSa6 = "IZXIIXZI"
+    UPSa7 = "XXXXXXXX"
+    UPSa8 = "ZZZZZZZZ"
 
-    UPSb1 = 'IXZIZXII'
-    UPSb2 = 'IIXZIZXI'
-    UPSb3 = 'IIIXZIZX'
-    UPSb4 = 'IXIIXZIZ'
-    UPSb5 = 'IZXIIXZI'
-    UPSb6 = 'IIZXIIXZ'
-    UPSb7 = 'XXXXXXXX'
-    UPSb8 = 'ZZZZZZZZ'
+    UPSb1 = "IXZIZXII"
+    UPSb2 = "IIXZIZXI"
+    UPSb3 = "IIIXZIZX"
+    UPSb4 = "IXIIXZIZ"
+    UPSb5 = "IZXIIXZI"
+    UPSb6 = "IIZXIIXZ"
+    UPSb7 = "XXXXXXXX"
+    UPSb8 = "ZZZZZZZZ"
 
-    UPSc1 = ['I', 'I', 'X', 'Z', 'Z', 'X']
-    UPSc2 = ['I', 'I', 'Y', 'X', 'X', 'Y']
-    UPSc3 = ['I', 'X', 'I', 'Z', 'X', 'Z']
-    UPSc4 = ['I', 'Z', 'X', 'X', 'I', 'Z']
-    UPSc5 = ['X', 'I', 'Z', 'Z', 'X', 'I']
-    UPSc6 = ['Z', 'I', 'Z', 'X', 'I', 'X']
-
+    UPSc1 = ["I", "I", "X", "Z", "Z", "X"]
+    UPSc2 = ["I", "I", "Y", "X", "X", "Y"]
+    UPSc3 = ["I", "X", "I", "Z", "X", "Z"]
+    UPSc4 = ["I", "Z", "X", "X", "I", "Z"]
+    UPSc5 = ["X", "I", "Z", "Z", "X", "I"]
+    UPSc6 = ["Z", "I", "Z", "X", "I", "X"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:

@@ -1,7 +1,14 @@
 from hypertiling.kernel.GRG import GenerativeReflectionGraph
-from hqec.operator_push.tensor_toolbox import traverse_h_gate, ensure_minimum_legs, add_logical_legs, \
-    create_topology_by_segments, swap_tensor_legs, get_tensor_from_id
+
 from hqec.operator_push.network_toolbox import assign_layers_to_tensors, get_tensors_by_layer
+from hqec.operator_push.tensor_toolbox import (
+    add_logical_legs,
+    create_topology_by_segments,
+    ensure_minimum_legs,
+    get_tensor_from_id,
+    swap_tensor_legs,
+    traverse_h_gate,
+)
 
 
 def find_all_same_layer_neighbor_pairs(tensor_list):
@@ -27,6 +34,7 @@ def find_all_same_layer_neighbor_pairs(tensor_list):
 
     # Convert the set to a list and return
     return list(same_layer_neighbor_pairs)
+
 
 # Assuming each tensor has a find_same_layer_neighbor method, and tensor_list is a list of all tensors
 # Example usage:
@@ -65,6 +73,7 @@ def find_split_tuples(tensor_tuples, split_numbers):
 
     return split_tuples
 
+
 # Assuming tensor_tuples is the list obtained from the previous step (same_layer_neighbor_pairs list)
 # split_numbers is a given list of numbers in descending order
 # Example usage:
@@ -97,6 +106,7 @@ def find_tensors_with_two_upper_neighbors(tensor_list):
 
     return unique_upper_neighbor_pairs
 
+
 # Example usage:
 # tensors_with_two_upper_neighbors = find_tensors_with_two_upper_neighbors(tensor_list)
 
@@ -112,8 +122,7 @@ def find_common_lower_layer_neighbors(tensor_pairs, tensor_list):
         # Find common neighbors that are in the lower layer
         common = tensor_1_neighbors.intersection(tensor_2_neighbors)
         lower_layer_neighbors = [
-            neighbor_id for neighbor_id in common
-            if tensor_list[neighbor_id].layer > tensor_list[tensor_id_1].layer
+            neighbor_id for neighbor_id in common if tensor_list[neighbor_id].layer > tensor_list[tensor_id_1].layer
         ]
 
         # If there are common lower layer neighbors, record them
@@ -121,6 +130,7 @@ def find_common_lower_layer_neighbors(tensor_pairs, tensor_list):
             common_neighbors[(tensor_id_1, tensor_id_2)] = lower_layer_neighbors
 
     return common_neighbors
+
 
 # Example usage:
 # Given a list of tuples with tensor IDs
@@ -181,8 +191,9 @@ def setup_htn(l):
     # Correct the leg order of tensors with 2 parent tensors cut by a section line
     two_parent_tensor_pairs = find_tensors_with_two_upper_neighbors(tensor_list)
     split_two_parent_tensor_pairs = find_split_tuples(two_parent_tensor_pairs, split_numbers)
-    split_two_parent_tensor_pairs_to_children_tensor = find_common_lower_layer_neighbors(split_two_parent_tensor_pairs,
-                                                                                         tensor_list)
+    split_two_parent_tensor_pairs_to_children_tensor = find_common_lower_layer_neighbors(
+        split_two_parent_tensor_pairs, tensor_list
+    )
     for children_tensor_id_list in split_two_parent_tensor_pairs_to_children_tensor.values():
         if children_tensor_id_list:
             children_tensor_id = children_tensor_id_list[0]
@@ -192,11 +203,11 @@ def setup_htn(l):
                 swap_tensor_legs(children_tensor, 2, 3, tensor_list)
 
     # Define UPS generators
-    UPS1 = ['X', 'X', 'X', 'X', 'I']
-    UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-    UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-    UPS4 = ['I', 'X', 'I', 'X', 'X']
-    UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+    UPS1 = ["X", "X", "X", "X", "I"]
+    UPS2 = ["Z", "I", "Z", "I", "I"]
+    UPS3 = ["I", "Z", "I", "Z", "I"]
+    UPS4 = ["I", "X", "I", "X", "X"]
+    UPS5 = ["I", "I", "Z", "Z", "Z"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:

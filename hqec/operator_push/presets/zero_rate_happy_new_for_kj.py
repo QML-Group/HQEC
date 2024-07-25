@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_zero_rate_happy(R):
@@ -35,23 +35,39 @@ def setup_zero_rate_happy(R):
     assign_layers_to_tensors(tensor_list, 0)
 
     # Define UPS generators
-    UPSa1 = ['X', 'Z', 'Z', 'X', 'I', 'I']
-    UPSa2 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSa3 = ['X', 'I', 'X', 'Z', 'Z', 'I']
-    UPSa4 = ['Z', 'X', 'I', 'X', 'Z', 'I']
-    UPSa5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSa6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSa1 = ["X", "Z", "Z", "X", "I", "I"]
+    UPSa2 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSa3 = ["X", "I", "X", "Z", "Z", "I"]
+    UPSa4 = ["Z", "X", "I", "X", "Z", "I"]
+    UPSa5 = ["X", "X", "X", "X", "X", "X"]
+    UPSa6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSb1 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSb2 = ['I', 'I', 'X', 'Z', 'Z', 'X']
-    UPSb3 = ['I', 'X', 'I', 'X', 'Z', 'Z']
-    UPSb4 = ['I', 'Z', 'X', 'I', 'X', 'Z']
-    UPSb5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSb6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSb1 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSb2 = ["I", "I", "X", "Z", "Z", "X"]
+    UPSb3 = ["I", "X", "I", "X", "Z", "Z"]
+    UPSb4 = ["I", "Z", "X", "I", "X", "Z"]
+    UPSb5 = ["X", "X", "X", "X", "X", "X"]
+    UPSb6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    ul = ['IIXZZX', 'IIZYYZ', 'IZXXIZ', 'IXIZXZ', 'IYXYXI', 'ZIZXIX', 'XIZZXI', 'YIIYXX', 'ZZYIIY', 'ZXZYXY', 'ZYYZXX',
-     'XZYYXZ', 'YZXZXY', 'XXZIIZ', 'XYYXII', 'YXIXIY', 'YYXIIX']
-
+    ul = [
+        "IIXZZX",
+        "IIZYYZ",
+        "IZXXIZ",
+        "IXIZXZ",
+        "IYXYXI",
+        "ZIZXIX",
+        "XIZZXI",
+        "YIIYXX",
+        "ZZYIIY",
+        "ZXZYXY",
+        "ZYYZXX",
+        "XZYYXZ",
+        "YZXZXY",
+        "XXZIIZ",
+        "XYYXII",
+        "YXIXIY",
+        "YYXIIX",
+    ]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -115,17 +131,16 @@ def setup_max_rate_happy(R):
     assign_layers_to_tensors(tensor_list, 0)
 
     # Define UPS generators
-    UPSa1 = ['X', 'Z', 'Z', 'X', 'I', 'I']
-    UPSa2 = ['I', 'X', 'Z', 'Z', 'X', 'I']
-    UPSa3 = ['X', 'I', 'X', 'Z', 'Z', 'I']
-    UPSa4 = ['Z', 'X', 'I', 'X', 'Z', 'I']
-    UPSa5 = ['X', 'X', 'X', 'X', 'X', 'X']
-    UPSa6 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSa1 = ["X", "Z", "Z", "X", "I", "I"]
+    UPSa2 = ["I", "X", "Z", "Z", "X", "I"]
+    UPSa3 = ["X", "I", "X", "Z", "Z", "I"]
+    UPSa4 = ["Z", "X", "I", "X", "Z", "I"]
+    UPSa5 = ["X", "X", "X", "X", "X", "X"]
+    UPSa6 = ["Z", "Z", "Z", "Z", "Z", "Z"]
 
-    ulb = ['IXZZXI', 'IZYYZI', 'ZXXIZI', 'XIZXZI', 'YXYXII', 'IZXIXZ', 'IZZXIX', 'IIYXXY']
+    ulb = ["IXZZXI", "IZYYZI", "ZXXIZI", "XIZXZI", "YXYXII", "IZXIXZ", "IZZXIX", "IIYXXY"]
 
-    ul = ['IZYYZI', 'IXZZXI', 'IYXXYI', 'ZIZYYI', 'XIXZZI', 'YIYXXI', 'IIYZYZ', 'IIZXZX', 'IIXYXY']
-
+    ul = ["IZYYZI", "IXZZXI", "IYXXYI", "ZIZYYI", "XIXZZI", "YIYXXI", "IIYZYZ", "IIZXZX", "IIXYXY"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:

@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_happy_plus_scf_max(R):
@@ -32,34 +32,34 @@ def setup_happy_plus_scf_max(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define SCF UPS generators
-    sUPSa1 = 'IXXIXI'
-    sUPSa2 = 'XIIXXI'
-    sUPSa3 = 'IZIZZI'
-    sUPSa4 = 'ZIZIZI'
-    sUPSa5 = 'IXIXIX'
-    sUPSa6 = 'ZIIZIZ'
+    sUPSa1 = "IXXIXI"
+    sUPSa2 = "XIIXXI"
+    sUPSa3 = "IZIZZI"
+    sUPSa4 = "ZIZIZI"
+    sUPSa5 = "IXIXIX"
+    sUPSa6 = "ZIIZIZ"
 
-    sUPSb1 = 'IXXIXI'
-    sUPSb2 = 'XIIXXI'
-    sUPSb3 = 'IZIZZI'
-    sUPSb4 = 'ZIZIZI'
-    sUPSb5 = 'IXIXIX'
-    sUPSb6 = 'IIZZZZ'
+    sUPSb1 = "IXXIXI"
+    sUPSb2 = "XIIXXI"
+    sUPSb3 = "IZIZZI"
+    sUPSb4 = "ZIZIZI"
+    sUPSb5 = "IXIXIX"
+    sUPSb6 = "IIZZZZ"
 
-    sUPSc1 = 'IXXIXI'
-    sUPSc2 = 'XIIXXI'
-    sUPSc3 = 'IZIZZI'
-    sUPSc4 = 'ZIZIZI'
-    sUPSc5 = 'IIXXXX'
-    sUPSc6 = 'IIZZZZ'
+    sUPSc1 = "IXXIXI"
+    sUPSc2 = "XIIXXI"
+    sUPSc3 = "IZIZZI"
+    sUPSc4 = "ZIZIZI"
+    sUPSc5 = "IIXXXX"
+    sUPSc6 = "IIZZZZ"
 
     # Define happy UPS generators
-    hUPSa1 = 'XZZXII'
-    hUPSa2 = 'IXZZXI'
-    hUPSa3 = 'XIXZZI'
-    hUPSa4 = 'ZXIXZI'
-    hUPSa5 = 'XXXXXX'
-    hUPSa6 = 'ZZZZZZ'
+    hUPSa1 = "XZZXII"
+    hUPSa2 = "IXZZXI"
+    hUPSa3 = "XIXZZI"
+    hUPSa4 = "ZXIXZI"
+    hUPSa5 = "XXXXXX"
+    hUPSa6 = "ZZZZZZ"
 
     # Assign UPS to tensors
     for tensor in tensor_list:

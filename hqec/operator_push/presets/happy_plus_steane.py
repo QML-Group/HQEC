@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_happy_plus_steane_max(R):
@@ -30,12 +30,20 @@ def setup_happy_plus_steane_max(R):
     for i, current_layer_tensor_id_list in enumerate(layer_list):
         if i % 2 == 0:
             # Ensure Minimum Legs to 7 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=7, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=7,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
         else:
             # Ensure Minimum Legs to 5 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=5, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=5,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
 
     # Add Logical
     add_logical_legs(tensor_list=tensor_list, start_idx=0, end_idx=len(tensor_list))
@@ -44,38 +52,55 @@ def setup_happy_plus_steane_max(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define Steane UPS generators
-    UPSa1 = ['X', 'X', 'X', 'I', 'I', 'I', 'X', 'I']
-    UPSa2 = ['X', 'I', 'X', 'X', 'X', 'I', 'I', 'I']
-    UPSa3 = ['X', 'I', 'I', 'I', 'X', 'X', 'X', 'I']
-    UPSa4 = ['Z', 'Z', 'Z', 'I', 'I', 'I', 'Z', 'I']
-    UPSa5 = ['Z', 'I', 'Z', 'Z', 'Z', 'I', 'I', 'I']
-    UPSa6 = ['Z', 'I', 'I', 'I', 'Z', 'Z', 'Z', 'I']
-    UPSa7 = ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']
-    UPSa8 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSa1 = ["X", "X", "X", "I", "I", "I", "X", "I"]
+    UPSa2 = ["X", "I", "X", "X", "X", "I", "I", "I"]
+    UPSa3 = ["X", "I", "I", "I", "X", "X", "X", "I"]
+    UPSa4 = ["Z", "Z", "Z", "I", "I", "I", "Z", "I"]
+    UPSa5 = ["Z", "I", "Z", "Z", "Z", "I", "I", "I"]
+    UPSa6 = ["Z", "I", "I", "I", "Z", "Z", "Z", "I"]
+    UPSa7 = ["X", "X", "X", "X", "X", "X", "X", "X"]
+    UPSa8 = ["Z", "Z", "Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSb1 = ['X', 'X', 'X', 'X', 'I', 'I', 'I', 'I']
-    UPSb2 = ['I', 'X', 'I', 'X', 'X', 'X', 'I', 'I']
-    UPSb3 = ['I', 'I', 'X', 'X', 'I', 'X', 'X', 'I']
-    UPSb4 = ['Z', 'Z', 'Z', 'Z', 'I', 'I', 'I', 'I']
-    UPSb5 = ['I', 'Z', 'I', 'Z', 'Z', 'Z', 'I', 'I']
-    UPSb6 = ['I', 'I', 'Z', 'Z', 'I', 'Z', 'Z', 'I']
-    UPSb7 = ['I', 'I', 'I', 'I', 'X', 'X', 'X', 'X']
-    UPSb8 = ['I', 'I', 'I', 'I', 'Z', 'Z', 'Z', 'Z']
+    UPSb1 = ["X", "X", "X", "X", "I", "I", "I", "I"]
+    UPSb2 = ["I", "X", "I", "X", "X", "X", "I", "I"]
+    UPSb3 = ["I", "I", "X", "X", "I", "X", "X", "I"]
+    UPSb4 = ["Z", "Z", "Z", "Z", "I", "I", "I", "I"]
+    UPSb5 = ["I", "Z", "I", "Z", "Z", "Z", "I", "I"]
+    UPSb6 = ["I", "I", "Z", "Z", "I", "Z", "Z", "I"]
+    UPSb7 = ["I", "I", "I", "I", "X", "X", "X", "X"]
+    UPSb8 = ["I", "I", "I", "I", "Z", "Z", "Z", "Z"]
 
-    ul = ['IIZZIZZI', 'IIXXIXXI', 'IZIZZZII', 'IXIXXXII', 'IYIYYYII', 'ZIIZZIZI', 'XIIXXIXI', 'YIIYYIYI', 'ZZIIIZZI',
-          'ZXIYYXZI', 'ZYIXXYZI', 'XZIYYZXI', 'YZIXXZYI', 'XXIIIXXI', 'XYIZZYXI', 'YXIZZXYI', 'YYIIIYYI']
+    ul = [
+        "IIZZIZZI",
+        "IIXXIXXI",
+        "IZIZZZII",
+        "IXIXXXII",
+        "IYIYYYII",
+        "ZIIZZIZI",
+        "XIIXXIXI",
+        "YIIYYIYI",
+        "ZZIIIZZI",
+        "ZXIYYXZI",
+        "ZYIXXYZI",
+        "XZIYYZXI",
+        "YZIXXZYI",
+        "XXIIIXXI",
+        "XYIZZYXI",
+        "YXIZZXYI",
+        "YYIIIYYI",
+    ]
 
     # Define happy UPS generators
-    hUPSa1 = 'XZZXII'
-    hUPSa2 = 'IXZZXI'
-    hUPSa3 = 'XIXZZI'
-    hUPSa4 = 'ZXIXZI'
-    hUPSa5 = 'XXXXXX'
-    hUPSa6 = 'ZZZZZZ'
+    hUPSa1 = "XZZXII"
+    hUPSa2 = "IXZZXI"
+    hUPSa3 = "XIXZZI"
+    hUPSa4 = "ZXIXZI"
+    hUPSa5 = "XXXXXX"
+    hUPSa6 = "ZZZZZZ"
 
-    hulb = ['IXZZXI', 'IZYYZI', 'ZXXIZI', 'XIZXZI', 'YXYXII', 'IZXIXZ', 'IZZXIX', 'IIYXXY']
+    hulb = ["IXZZXI", "IZYYZI", "ZXXIZI", "XIZXZI", "YXYXII", "IZXIXZ", "IZZXIX", "IIYXXY"]
 
-    hul = ['IZYYZI', 'IXZZXI', 'IYXXYI', 'ZIZYYI', 'XIXZZI', 'YIYXXI', 'IIYZYZ', 'IIZXZX', 'IIXYXY']
+    hul = ["IZYYZI", "IXZZXI", "IYXXYI", "ZIZYYI", "XIXZZI", "YIYXXI", "IIYZYZ", "IIZXZX", "IIXYXY"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -109,8 +134,8 @@ def setup_happy_plus_steane_max(R):
                 if current_layer % 2 == 1:
                     tensor.ups_list = ul
                     tensor.stabilizer_list = [ul[0], ul[1]]
-                    tensor.logical_z_list = ['IIIIZZZZ']
-                    tensor.logical_x_list = ['IIIIXXXX']
+                    tensor.logical_z_list = ["IIIIZZZZ"]
+                    tensor.logical_x_list = ["IIIIXXXX"]
                 else:
                     tensor.ups_list = hul
                     tensor.stabilizer_list = []

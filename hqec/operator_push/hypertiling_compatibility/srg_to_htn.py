@@ -1,5 +1,6 @@
-from hqec.operator_push.tensor_toolbox import TensorLeg, Tensor, get_tensor_from_id, swap_tensor_legs
 from hypertiling import HyperbolicTiling
+
+from hqec.operator_push.tensor_toolbox import Tensor, TensorLeg, get_tensor_from_id, swap_tensor_legs
 
 
 def generate_tiling_with_layers(p, q, n):
@@ -40,6 +41,7 @@ def share_common_edge(poly_id1, poly_id2, tiling_obj, q):
     # If the number of common neighbors is equal to 2 * (q - 2), they share an edge
     return len(common_nbrs) == 2 * (q - 2)
 
+
 # Example usage:
 # Assuming T is an instance of HyperbolicTiling and q is defined
 # result = share_common_edge(4, 6, T, q)
@@ -59,6 +61,7 @@ def get_shared_edge_neighbors(poly_id, tiling_obj, q):
             shared_edge_neighbors.append(nbr_id)
 
     return shared_edge_neighbors
+
 
 # Example usage:
 # Assuming T is an instance of HyperbolicTiling and q is defined
@@ -126,32 +129,41 @@ def determine_directed_neighbors(poly_id, tiling_obj, layers_info, q=5):
     if same_layer_neighbors:
         # If the current polygon ID is not the smallest and largest in the layer
         if poly_id != min(current_layer_poly_ids) and poly_id != max(current_layer_poly_ids):
-            directed_poly.left = find_key_by_value(dictionary=poly_id_mapping,
-                                                   value=min(same_layer_neighbors_mapped_poly_id))
-            directed_poly.right = find_key_by_value(dictionary=poly_id_mapping,
-                                                    value=max(same_layer_neighbors_mapped_poly_id))
+            directed_poly.left = find_key_by_value(
+                dictionary=poly_id_mapping, value=min(same_layer_neighbors_mapped_poly_id)
+            )
+            directed_poly.right = find_key_by_value(
+                dictionary=poly_id_mapping, value=max(same_layer_neighbors_mapped_poly_id)
+            )
         else:
-            directed_poly.left = find_key_by_value(dictionary=poly_id_mapping,
-                                                   value=max(same_layer_neighbors_mapped_poly_id))
-            directed_poly.right = find_key_by_value(dictionary=poly_id_mapping,
-                                                    value=min(same_layer_neighbors_mapped_poly_id))
+            directed_poly.left = find_key_by_value(
+                dictionary=poly_id_mapping, value=max(same_layer_neighbors_mapped_poly_id)
+            )
+            directed_poly.right = find_key_by_value(
+                dictionary=poly_id_mapping, value=min(same_layer_neighbors_mapped_poly_id)
+            )
 
     # Use the poly ID mapping to ensure direction correctness, addressing a hypertiling bug
     lower_layer_neighbors_mapped_poly_id = [poly_id_mapping[nbr] for nbr in lower_layer_neighbors]
 
     # Determine left_front and right_front neighbors
     if len(lower_layer_neighbors) == 2:
-        if min(lower_layer_neighbors) != min(next_layer_poly_ids) and \
-                max(lower_layer_neighbors) != max(next_layer_poly_ids):
-            directed_poly.left_front = find_key_by_value(dictionary=poly_id_mapping,
-                                                         value=min(lower_layer_neighbors_mapped_poly_id))
-            directed_poly.right_front = find_key_by_value(dictionary=poly_id_mapping,
-                                                          value=max(lower_layer_neighbors_mapped_poly_id))
+        if min(lower_layer_neighbors) != min(next_layer_poly_ids) and max(lower_layer_neighbors) != max(
+            next_layer_poly_ids
+        ):
+            directed_poly.left_front = find_key_by_value(
+                dictionary=poly_id_mapping, value=min(lower_layer_neighbors_mapped_poly_id)
+            )
+            directed_poly.right_front = find_key_by_value(
+                dictionary=poly_id_mapping, value=max(lower_layer_neighbors_mapped_poly_id)
+            )
         else:
-            directed_poly.left_front = find_key_by_value(dictionary=poly_id_mapping,
-                                                         value=max(lower_layer_neighbors_mapped_poly_id))
-            directed_poly.right_front = find_key_by_value(dictionary=poly_id_mapping,
-                                                          value=min(lower_layer_neighbors_mapped_poly_id))
+            directed_poly.left_front = find_key_by_value(
+                dictionary=poly_id_mapping, value=max(lower_layer_neighbors_mapped_poly_id)
+            )
+            directed_poly.right_front = find_key_by_value(
+                dictionary=poly_id_mapping, value=min(lower_layer_neighbors_mapped_poly_id)
+            )
 
     return directed_poly
 
@@ -165,6 +177,7 @@ def create_directed_polygons(tiling_obj, layers_info):
         directed_polygons[poly_id] = directed_polygon
 
     return directed_polygons
+
 
 # Example usage:
 # Assuming tiling_obj and layers_info are defined
@@ -233,6 +246,7 @@ def has_only_left_right_neighbors(poly_id, directed_polygons):
         # Alternatively, you can raise an exception with a message
         # raise ValueError(f"No DirectedPolygon found with poly_id: {poly_id}")
 
+
 # Example usage:
 # directed_polygons = { ... } # Assuming this is a dictionary containing DirectedPolygon instances
 # result = has_only_left_right_neighbors(12, directed_polygons)
@@ -253,12 +267,15 @@ def has_only_all_front_neighbors(poly_id, directed_polygons):
         has_right_front = directed_poly.right_front is not None
         has_all_front = directed_poly.all_front is not None and directed_poly.all_front != []
 
-        return has_all_front and not (has_back or has_left or has_right or has_front or has_left_front or has_right_front)
+        return has_all_front and not (
+            has_back or has_left or has_right or has_front or has_left_front or has_right_front
+        )
     else:
         # If no DirectedPolygon instance is found, return False or raise an exception
         return False
         # Alternatively, you can raise an exception with a message
         # raise ValueError(f"No DirectedPolygon found with poly_id: {poly_id}")
+
 
 # Example usage:
 # directed_polygons = { ... } # Assuming this is a dictionary containing DirectedPolygon instances
@@ -272,21 +289,24 @@ def has_any_neighbor(poly_id, directed_polygons):
 
     # Check if the polygon has neighbors in any direction
     if directed_poly:
-        has_neighbors = any([
-            directed_poly.back is not None,
-            directed_poly.left is not None,
-            directed_poly.right is not None,
-            directed_poly.front is not None,
-            directed_poly.left_front is not None,
-            directed_poly.right_front is not None,
-            directed_poly.all_front is not None and directed_poly.all_front != []
-        ])
+        has_neighbors = any(
+            [
+                directed_poly.back is not None,
+                directed_poly.left is not None,
+                directed_poly.right is not None,
+                directed_poly.front is not None,
+                directed_poly.left_front is not None,
+                directed_poly.right_front is not None,
+                directed_poly.all_front is not None and directed_poly.all_front != [],
+            ]
+        )
         return has_neighbors
     else:
         # If no DirectedPolygon instance is found, return False or raise an exception
         return False
         # Alternatively, you can raise an exception with a message
         # raise ValueError(f"No DirectedPolygon found with poly_id: {poly_id}")
+
 
 # Example usage:
 # directed_polygons = { ... } # Assuming this is a dictionary containing DirectedPolygon instances
@@ -310,7 +330,7 @@ def generate_tensor_with_legs(poly_id, directed_polygons, poly_id_mapping, tenso
     if poly_id == 0:  # Special case: center polygon
         for front_id in directed_poly.all_front:
             tensor_id_front = poly_id_mapping[front_id]
-            tensor.add_leg(TensorLeg('I', (tensor_id_front, None)))
+            tensor.add_leg(TensorLeg("I", (tensor_id_front, None)))
     else:
         # Check if there are only left and right neighbors
         has_only_lr_neighbors = has_only_left_right_neighbors(poly_id, directed_polygons)
@@ -318,19 +338,19 @@ def generate_tensor_with_legs(poly_id, directed_polygons, poly_id_mapping, tenso
         # Determine the connection direction (clockwise or counterclockwise)
         if has_only_lr_neighbors:
             # Clockwise direction: right, left, left front, right front
-            order = ['right', 'left', 'left_front', 'right_front']
+            order = ["right", "left", "left_front", "right_front"]
         else:
             # Clockwise direction: back, left, front, right
-            order = ['back', 'left', 'front', 'right']
+            order = ["back", "left", "front", "right"]
 
         # Add legs
         for direction in order:
             neighbor_id = getattr(directed_poly, direction, None)
             if neighbor_id is not None:
                 tensor_id_nbr = poly_id_mapping[neighbor_id]
-                tensor.add_leg(TensorLeg('I', (tensor_id_nbr, None)))
+                tensor.add_leg(TensorLeg("I", (tensor_id_nbr, None)))
             else:
-                tensor.add_leg(TensorLeg('I', None))  # Unconnected leg
+                tensor.add_leg(TensorLeg("I", None))  # Unconnected leg
 
     # Add the tensor to the tensor list
     tensor_list.append(tensor)
