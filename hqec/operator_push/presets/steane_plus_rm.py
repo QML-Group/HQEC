@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_steane_plus_rm_zero(R):
@@ -22,7 +22,9 @@ def setup_steane_plus_rm_zero(R):
         layer_list.append(r1)
         for i, R_num in enumerate(range(2, R + 1)):
             if i % 2 == 0:
-                temp = create_layer_q4(tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=16)
+                temp = create_layer_q4(
+                    tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=16
+                )
             else:
                 temp = create_layer_q4(tensor_list=tensor_list, previous_layer_id_list=layer_list[i], legs_per_tensor=8)
             layer_list.append(temp)
@@ -30,12 +32,20 @@ def setup_steane_plus_rm_zero(R):
     for i, current_layer_tensor_id_list in enumerate(layer_list):
         if i % 2 == 0:
             # Ensure Minimum Legs to 16 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=16, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=16,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
         else:
             # Ensure Minimum Legs to 6 for tensors in this layer
-            ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=8, start_idx=current_layer_tensor_id_list[0],
-                                end_idx=current_layer_tensor_id_list[-1] + 1)
+            ensure_minimum_legs(
+                tensor_list=tensor_list,
+                target_leg_number=8,
+                start_idx=current_layer_tensor_id_list[0],
+                end_idx=current_layer_tensor_id_list[-1] + 1,
+            )
 
     # Add Logical
     add_logical_legs(tensor_list=tensor_list, start_idx=0, end_idx=1)
@@ -107,34 +117,33 @@ def setup_steane_plus_rm_zero(R):
     upsc15 = "IIXXIIXXIIXXIIXX"
     upsc16 = "IIZZIIZZIIZZIIZZ"
 
-
     # Define happy UPS generators
-    UPSa1 = ['X', 'X', 'X', 'I', 'I', 'I', 'X', 'I']
-    UPSa2 = ['X', 'I', 'X', 'X', 'X', 'I', 'I', 'I']
-    UPSa3 = ['X', 'I', 'I', 'I', 'X', 'X', 'X', 'I']
-    UPSa4 = ['Z', 'Z', 'Z', 'I', 'I', 'I', 'Z', 'I']
-    UPSa5 = ['Z', 'I', 'Z', 'Z', 'Z', 'I', 'I', 'I']
-    UPSa6 = ['Z', 'I', 'I', 'I', 'Z', 'Z', 'Z', 'I']
-    UPSa7 = ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']
-    UPSa8 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSa1 = ["X", "X", "X", "I", "I", "I", "X", "I"]
+    UPSa2 = ["X", "I", "X", "X", "X", "I", "I", "I"]
+    UPSa3 = ["X", "I", "I", "I", "X", "X", "X", "I"]
+    UPSa4 = ["Z", "Z", "Z", "I", "I", "I", "Z", "I"]
+    UPSa5 = ["Z", "I", "Z", "Z", "Z", "I", "I", "I"]
+    UPSa6 = ["Z", "I", "I", "I", "Z", "Z", "Z", "I"]
+    UPSa7 = ["X", "X", "X", "X", "X", "X", "X", "X"]
+    UPSa8 = ["Z", "Z", "Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSc1 = ['I', 'X', 'X', 'X', 'I', 'I', 'I', 'X']
-    UPSc2 = ['I', 'X', 'I', 'X', 'X', 'X', 'I', 'I']
-    UPSc3 = ['I', 'X', 'I', 'I', 'I', 'X', 'X', 'X']
-    UPSc4 = ['I', 'Z', 'Z', 'Z', 'I', 'I', 'I', 'Z']
-    UPSc5 = ['I', 'Z', 'I', 'Z', 'Z', 'Z', 'I', 'I']
-    UPSc6 = ['I', 'Z', 'I', 'I', 'I', 'Z', 'Z', 'Z']
-    UPSc7 = ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']
-    UPSc8 = ['Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z']
+    UPSc1 = ["I", "X", "X", "X", "I", "I", "I", "X"]
+    UPSc2 = ["I", "X", "I", "X", "X", "X", "I", "I"]
+    UPSc3 = ["I", "X", "I", "I", "I", "X", "X", "X"]
+    UPSc4 = ["I", "Z", "Z", "Z", "I", "I", "I", "Z"]
+    UPSc5 = ["I", "Z", "I", "Z", "Z", "Z", "I", "I"]
+    UPSc6 = ["I", "Z", "I", "I", "I", "Z", "Z", "Z"]
+    UPSc7 = ["X", "X", "X", "X", "X", "X", "X", "X"]
+    UPSc8 = ["Z", "Z", "Z", "Z", "Z", "Z", "Z", "Z"]
 
-    UPSd1 = ['I', 'X', 'X', 'X', 'I', 'I', 'I', 'X']
-    UPSd2 = ['I', 'I', 'I', 'X', 'X', 'X', 'I', 'X']
-    UPSd3 = ['I', 'I', 'X', 'X', 'I', 'X', 'X', 'I']
-    UPSd4 = ['I', 'Z', 'Z', 'Z', 'I', 'I', 'I', 'Z']
-    UPSd5 = ['I', 'I', 'I', 'Z', 'Z', 'Z', 'I', 'Z']
-    UPSd6 = ['I', 'I', 'Z', 'Z', 'I', 'Z', 'Z', 'I']
-    UPSd7 = ['X', 'I', 'I', 'I', 'X', 'X', 'X', 'I']
-    UPSd8 = ['Z', 'I', 'I', 'I', 'Z', 'Z', 'Z', 'I']
+    UPSd1 = ["I", "X", "X", "X", "I", "I", "I", "X"]
+    UPSd2 = ["I", "I", "I", "X", "X", "X", "I", "X"]
+    UPSd3 = ["I", "I", "X", "X", "I", "X", "X", "I"]
+    UPSd4 = ["I", "Z", "Z", "Z", "I", "I", "I", "Z"]
+    UPSd5 = ["I", "I", "I", "Z", "Z", "Z", "I", "Z"]
+    UPSd6 = ["I", "I", "Z", "Z", "I", "Z", "Z", "I"]
+    UPSd7 = ["X", "I", "I", "I", "X", "X", "X", "I"]
+    UPSd8 = ["Z", "I", "I", "I", "Z", "Z", "Z", "I"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -154,10 +163,41 @@ def setup_steane_plus_rm_zero(R):
             if len(upper_neighbors) == 1:
                 # Rule 2
                 if current_layer % 2 == 1:
-                    tensor.ups_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10, upsb11,
-                                       upsb12, upsb13, upsb14, upsb15, upsb16, upsb17]
-                    tensor.stabilizer_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10,
-                                              upsb11, upsb12, upsb13, upsb14]
+                    tensor.ups_list = [
+                        upsb1,
+                        upsb2,
+                        upsb3,
+                        upsb4,
+                        upsb5,
+                        upsb6,
+                        upsb7,
+                        upsb8,
+                        upsb9,
+                        upsb10,
+                        upsb11,
+                        upsb12,
+                        upsb13,
+                        upsb14,
+                        upsb15,
+                        upsb16,
+                        upsb17,
+                    ]
+                    tensor.stabilizer_list = [
+                        upsb1,
+                        upsb2,
+                        upsb3,
+                        upsb4,
+                        upsb5,
+                        upsb6,
+                        upsb7,
+                        upsb8,
+                        upsb9,
+                        upsb10,
+                        upsb11,
+                        upsb12,
+                        upsb13,
+                        upsb14,
+                    ]
                 else:
                     tensor.ups_list = [UPSc1, UPSc2, UPSc3, UPSc4, UPSc5, UPSc6, UPSc7, UPSc8]
                     tensor.stabilizer_list = [UPSc1, UPSc2, UPSc3, UPSc4, UPSc5, UPSc6]
@@ -166,11 +206,50 @@ def setup_steane_plus_rm_zero(R):
             elif len(upper_neighbors) == 2:
                 # Rule 3
                 if current_layer % 2 == 1:
-                    tensor.ups_list = [upsc1, upsc2, upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc11,
-                                       upsc12, upsc13, upsc14, upsc15, upsc16, upsc1y, upsc2y, upsc3y, upscz, upscx,
-                                       upscyz, upsczx, upscyx, upsczy, upscxy, upscxy, upscxz]
-                    tensor.stabilizer_list = [upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc13, upsc14,
-                                              upsc15, upsc16]
+                    tensor.ups_list = [
+                        upsc1,
+                        upsc2,
+                        upsc3,
+                        upsc4,
+                        upsc5,
+                        upsc6,
+                        upsc7,
+                        upsc8,
+                        upsc9,
+                        upsc10,
+                        upsc11,
+                        upsc12,
+                        upsc13,
+                        upsc14,
+                        upsc15,
+                        upsc16,
+                        upsc1y,
+                        upsc2y,
+                        upsc3y,
+                        upscz,
+                        upscx,
+                        upscyz,
+                        upsczx,
+                        upscyx,
+                        upsczy,
+                        upscxy,
+                        upscxy,
+                        upscxz,
+                    ]
+                    tensor.stabilizer_list = [
+                        upsc3,
+                        upsc4,
+                        upsc5,
+                        upsc6,
+                        upsc7,
+                        upsc8,
+                        upsc9,
+                        upsc10,
+                        upsc13,
+                        upsc14,
+                        upsc15,
+                        upsc16,
+                    ]
                 else:
                     tensor.ups_list = [UPSd1, UPSd2, UPSd3, UPSd4, UPSd5, UPSd6, UPSd7, UPSd8]
                     tensor.stabilizer_list = [UPSd2, UPSd3, UPSd5, UPSd6]

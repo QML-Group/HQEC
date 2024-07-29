@@ -2,13 +2,12 @@ import os
 import tempfile
 
 from hqec.decoder.decoder_erasure import calculate_recovery_rates_for_p_range
-from hqec.input_processor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from hqec.input_processor import extract_logicals_from_result_dict, extract_stabilizers_from_result_dict
 from hqec.operator_push.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
 from hqec.operator_push.push_toolbox import batch_push_multiprocessing
 from hqec.output_processor import save_results_to_csv
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     for R in [0, 1, 2, 3]:
         tensor_list = setup_zero_rate_happy(R=R)
         results_dict = batch_push_multiprocessing(tensor_list)
@@ -24,9 +23,6 @@ if __name__ == '__main__':
             stabilizers=stabilizers,
             logical_operators=logical_operators,
             n_process=24,
-            cpu_affinity_list=list(range(8, 32))
+            cpu_affinity_list=list(range(8, 32)),
         )
-        save_results_to_csv(
-            results,
-            file_path=os.path.join(tempfile.gettempdir(), f'R{R}_rec.csv')
-        )
+        save_results_to_csv(results, file_path=os.path.join(tempfile.gettempdir(), f"R{R}_rec.csv"))

@@ -1,5 +1,5 @@
-from hqec.operator_push.network_toolbox import create_layer_q4, assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
+from hqec.operator_push.network_toolbox import assign_layers_to_tensors, create_layer_q4
+from hqec.operator_push.tensor_toolbox import Tensor, add_logical_legs, ensure_minimum_legs, get_tensor_from_id
 
 
 def setup_zero_rate_qrm(R):
@@ -24,8 +24,12 @@ def setup_zero_rate_qrm(R):
 
     for i, current_layer_tensor_id_list in enumerate(layer_list):
         # Ensure Minimum Legs to 16 for tensors in this layer
-        ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=16, start_idx=current_layer_tensor_id_list[0],
-                            end_idx=current_layer_tensor_id_list[-1] + 1)
+        ensure_minimum_legs(
+            tensor_list=tensor_list,
+            target_leg_number=16,
+            start_idx=current_layer_tensor_id_list[0],
+            end_idx=current_layer_tensor_id_list[-1] + 1,
+        )
 
     # Ensure Minimum Legs to 15 for tensor 0
     ensure_minimum_legs(tensor_list=tensor_list, target_leg_number=15, start_idx=0, end_idx=1)
@@ -87,8 +91,6 @@ def setup_zero_rate_qrm(R):
     upsc15 = "IIXXIIXXIIXXIIXX"
     upsc16 = "IIZZIIZZIIZZIIZZ"
 
-
-
     # Assign UPS to tensors
     for tensor in tensor_list:
 
@@ -98,24 +100,112 @@ def setup_zero_rate_qrm(R):
 
         if all(neighbor_layer > current_layer for neighbor_layer in neighbor_layers):
             # Rule 1
-            tensor.ups_list = [upsa1, upsa2, upsa3, upsa4, upsa5, upsa6, upsa7, upsa8, upsa9, upsa10, upsa11, upsa12,
-                               upsa13, upsa14, upsa15, upsa16]
-            tensor.stabilizer_list = [upsa1, upsa2, upsa3, upsa4, upsa5, upsa6, upsa7, upsa8, upsa9, upsa10, upsa11,
-                                      upsa12, upsa13, upsa14]
+            tensor.ups_list = [
+                upsa1,
+                upsa2,
+                upsa3,
+                upsa4,
+                upsa5,
+                upsa6,
+                upsa7,
+                upsa8,
+                upsa9,
+                upsa10,
+                upsa11,
+                upsa12,
+                upsa13,
+                upsa14,
+                upsa15,
+                upsa16,
+            ]
+            tensor.stabilizer_list = [
+                upsa1,
+                upsa2,
+                upsa3,
+                upsa4,
+                upsa5,
+                upsa6,
+                upsa7,
+                upsa8,
+                upsa9,
+                upsa10,
+                upsa11,
+                upsa12,
+                upsa13,
+                upsa14,
+            ]
             tensor.logical_z_list = [upsa16]
             tensor.logical_x_list = [upsa15]
         elif any(neighbor_layer < current_layer for neighbor_layer in neighbor_layers):
             upper_neighbors = [layer for layer in neighbor_layers if layer < current_layer]
             if len(upper_neighbors) == 1:
                 # Rule 2.c
-                tensor.ups_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10, upsb11,
-                                   upsb12, upsb13, upsb14, upsb15, upsb16]
-                tensor.stabilizer_list = [upsb1, upsb2, upsb3, upsb4, upsb5, upsb6, upsb7, upsb8, upsb9, upsb10, upsb11,
-                                          upsb12, upsb13, upsb14]
+                tensor.ups_list = [
+                    upsb1,
+                    upsb2,
+                    upsb3,
+                    upsb4,
+                    upsb5,
+                    upsb6,
+                    upsb7,
+                    upsb8,
+                    upsb9,
+                    upsb10,
+                    upsb11,
+                    upsb12,
+                    upsb13,
+                    upsb14,
+                    upsb15,
+                    upsb16,
+                ]
+                tensor.stabilizer_list = [
+                    upsb1,
+                    upsb2,
+                    upsb3,
+                    upsb4,
+                    upsb5,
+                    upsb6,
+                    upsb7,
+                    upsb8,
+                    upsb9,
+                    upsb10,
+                    upsb11,
+                    upsb12,
+                    upsb13,
+                    upsb14,
+                ]
             elif len(upper_neighbors) == 2:
                 # Rule 3.2
-                tensor.ups_list = [upsc1, upsc2, upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc11,
-                                   upsc12, upsc13, upsc14, upsc15, upsc16]
-                tensor.stabilizer_list = [upsc3, upsc4, upsc5, upsc6, upsc7, upsc8, upsc9, upsc10, upsc13, upsc14,
-                                          upsc15, upsc16]
+                tensor.ups_list = [
+                    upsc1,
+                    upsc2,
+                    upsc3,
+                    upsc4,
+                    upsc5,
+                    upsc6,
+                    upsc7,
+                    upsc8,
+                    upsc9,
+                    upsc10,
+                    upsc11,
+                    upsc12,
+                    upsc13,
+                    upsc14,
+                    upsc15,
+                    upsc16,
+                ]
+                tensor.stabilizer_list = [
+                    upsc3,
+                    upsc4,
+                    upsc5,
+                    upsc6,
+                    upsc7,
+                    upsc8,
+                    upsc9,
+                    upsc10,
+                    upsc13,
+                    upsc14,
+                    upsc15,
+                    upsc16,
+                ]
     return tensor_list

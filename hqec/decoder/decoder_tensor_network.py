@@ -1,27 +1,29 @@
 import os
+from multiprocessing import Pool
+
 import numpy as np
 import psutil
 import tensornetwork as tn
 
 from hqec.decoder.decoder_pauli import (
-    apply_mod2_sum, is_error_equivalent,
+    apply_mod2_sum,
     batch_convert_to_binary_vectors,
     binary_vector_to_pauli,
     calculate_syndrome,
     create_f,
     generate_pauli_error_vector,
+    is_error_equivalent,
 )
 from hqec.decoder.mod2_algebra import mod2_matrix_multiply
-from hqec.input_processor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from hqec.input_processor import extract_logicals_from_result_dict, extract_stabilizers_from_result_dict
 from hqec.operator_processor import pauli_to_binary_vector
-from hqec.operator_push.push_toolbox import batch_push
 from hqec.operator_push.operator_toolbox import traverse_ups_powers
-from multiprocessing import Pool
+from hqec.operator_push.push_toolbox import batch_push
 
 
 def pauli_to_indices(pauli_string):
     """Convert a Pauli string to a list of indices where I=0, X=1, Y=2, Z=3."""
-    pauli_map = {'I': 0, 'X': 1, 'Y': 2, 'Z': 3}
+    pauli_map = {"I": 0, "X": 1, "Y": 2, "Z": 3}
     return [pauli_map[char] for char in pauli_string]
 
 
@@ -54,7 +56,7 @@ def generate_tensor_array(tensor):
 
     # Fill tensor array
     for stab in all_stabs_list:
-        index_tuple = tuple('IXYZ'.index(char) for char in stab)  # Convert stabilizer to index tuple
+        index_tuple = tuple("IXYZ".index(char) for char in stab)  # Convert stabilizer to index tuple
         tensor_array[index_tuple] = 1
 
     # Create the dimension origin list
@@ -213,19 +215,16 @@ def collect_edges_during_backtrack(tensor_list, starting_tensor_id=0, logger_mod
     visited_tensors = set()
 
     # Start from the starting_tensor_id to visit and collect edges
-    recursively_collect_edges(tensor_list, starting_tensor_id, None, visited_tensors, edges_during_backtrack, logger_mode=logger_mode)
+    recursively_collect_edges(
+        tensor_list, starting_tensor_id, None, visited_tensors, edges_during_backtrack, logger_mode=logger_mode
+    )
 
     # Return the collected edge information
     return edges_during_backtrack
 
 
 def recursively_collect_edges(
-    tensor_list,
-    current_tensor_id,
-    previous_tensor_id,
-    visited_tensors,
-    edges_during_backtrack,
-    logger_mode=False
+    tensor_list, current_tensor_id, previous_tensor_id, visited_tensors, edges_during_backtrack, logger_mode=False
 ):
     # Get the current tensor
     current_tensor = get_tensor_from_id(tensor_list, current_tensor_id)
@@ -242,7 +241,9 @@ def recursively_collect_edges(
         # Compare layers to determine the direction of traversal
         if neighbor_tensor.layer >= current_tensor.layer:
             # Only traverse to tensors of higher or same layer
-            recursively_collect_edges(tensor_list, neighbor_id, current_tensor_id, visited_tensors, edges_during_backtrack, logger_mode)
+            recursively_collect_edges(
+                tensor_list, neighbor_id, current_tensor_id, visited_tensors, edges_during_backtrack, logger_mode
+            )
 
     # On backtracking, collect the edge information
     if previous_tensor_id is not None:
@@ -297,20 +298,21 @@ def collect_boundary_leg_ids(tensor_list, starting_tensor_id=0, logger_mode=Fals
     deeply_visited_tensors = set()
 
     # Start from starting_tensor_id to visit and collect leg ids
-    recursively_collect_boundary_leg_ids(tensor_list, starting_tensor_id, visited_tensors, boundary_leg_ids,
-                                         deeply_visited_tensors, logger_mode=logger_mode)
+    recursively_collect_boundary_leg_ids(
+        tensor_list,
+        starting_tensor_id,
+        visited_tensors,
+        boundary_leg_ids,
+        deeply_visited_tensors,
+        logger_mode=logger_mode,
+    )
 
     # Return the collected leg identifiers
     return boundary_leg_ids
 
 
 def recursively_collect_boundary_leg_ids(
-    tensor_list,
-    current_tensor_id,
-    visited_tensors,
-    boundary_leg_ids,
-    deeply_visited_tensors,
-    logger_mode=False
+    tensor_list, current_tensor_id, visited_tensors, boundary_leg_ids, deeply_visited_tensors, logger_mode=False
 ):
     # Get the current tensor
     if logger_mode:
@@ -338,12 +340,14 @@ def recursively_collect_boundary_leg_ids(
             higher_layer_neighbor_ids.append(neighbor_id)
 
     # Sort neighbor tensors by layer to prioritize visiting higher layers first
-    sorted_neighbors = sorted(higher_layer_neighbor_ids, key=lambda x: get_tensor_from_id(tensor_list, x).layer,
-                              reverse=True)
+    sorted_neighbors = sorted(
+        higher_layer_neighbor_ids, key=lambda x: get_tensor_from_id(tensor_list, x).layer, reverse=True
+    )
 
     for next_tensor_id in sorted_neighbors:
-        recursively_collect_boundary_leg_ids(tensor_list, next_tensor_id, visited_tensors, boundary_leg_ids,
-                                             deeply_visited_tensors, logger_mode)
+        recursively_collect_boundary_leg_ids(
+            tensor_list, next_tensor_id, visited_tensors, boundary_leg_ids, deeply_visited_tensors, logger_mode
+        )
 
     deeply_visited_tensors.add(current_tensor_id)
 
@@ -362,13 +366,13 @@ def create_bound_vector_tensor_node(p, rx, ry, rz, pauli_char):
     Returns:
     tn.Node: Tensor network node representing the boundary condition.
     """
-    if pauli_char == 'I':
+    if pauli_char == "I":
         p_vec = np.array([1 - p, p * rx, p * ry, p * rz])
-    elif pauli_char == 'X':
+    elif pauli_char == "X":
         p_vec = np.array([p * rx, 1 - p, p * rz, p * ry])
-    elif pauli_char == 'Y':
+    elif pauli_char == "Y":
         p_vec = np.array([p * ry, p * rz, 1 - p, p * rx])
-    elif pauli_char == 'Z':
+    elif pauli_char == "Z":
         p_vec = np.array([p * rz, p * ry, p * rx, 1 - p])
     else:
         raise ValueError("Invalid Pauli character. Must be one of 'I', 'X', 'Y', 'Z'.")
@@ -429,11 +433,16 @@ def normalize_tensor_node(node):
 def tn_quantum_error_correction_decoder_multiprocess(
     tensor_list,
     p,
-    rx, ry, rz,
+    rx,
+    ry,
+    rz,
     N,
-    stabilizers=None, logical_x=None, logical_z=None,
-    n_process=1, cpu_affinity_list=None,
-    f=None
+    stabilizers=None,
+    logical_x=None,
+    logical_z=None,
+    n_process=1,
+    cpu_affinity_list=None,
+    f=None,
 ):
     if stabilizers is None or logical_z is None or logical_x is None:
         results_dict = batch_push(tensor_list)
@@ -449,8 +458,10 @@ def tn_quantum_error_correction_decoder_multiprocess(
     if f is None:
         f = create_f(tensor_list=tensor_list)
 
-    args = [(tensor_list, p, rx, ry, rz, f, n, stabilizers, stabilizer_matrix, logical_z, logical_x, cpu_affinity_list)
-            for _ in range(N)]
+    args = [
+        (tensor_list, p, rx, ry, rz, f, n, stabilizers, stabilizer_matrix, logical_z, logical_x, cpu_affinity_list)
+        for _ in range(N)
+    ]
 
     successful_decodings = 0
     with Pool(n_process) as pool:
@@ -462,13 +473,7 @@ def tn_quantum_error_correction_decoder_multiprocess(
 
 
 def tensor_network_decoding_iteration(
-    tensor_list,
-    p,
-    rx, ry, rz,
-    f,
-    n,
-    stabilizers, stabilizer_matrix, logical_z, logical_x,
-    affinity=None
+    tensor_list, p, rx, ry, rz, f, n, stabilizers, stabilizer_matrix, logical_z, logical_x, affinity=None
 ):
     # Set CPU affinity for the process if specified
     if affinity is not None:
@@ -497,9 +502,9 @@ def tensor_network_decoder(tensor_list, p, rx, ry, rz, str_e, e, logical_z, logi
     tn_nodes = convert_np_tensors_to_tn_nodes(np_tensor_dict)
     connected_edges = connect_tn_nodes(tn_nodes, edges)
 
-    bound_connected_edges = add_boundary_conditions_to_dangling_edges(tn_nodes=tn_nodes,
-                                                                      boundary_leg_ids=boundary_leg_ids,
-                                                                      s_pauli=str_e, p=p, rx=rx, ry=ry, rz=rz)
+    bound_connected_edges = add_boundary_conditions_to_dangling_edges(
+        tn_nodes=tn_nodes, boundary_leg_ids=boundary_leg_ids, s_pauli=str_e, p=p, rx=rx, ry=ry, rz=rz
+    )
     new_node = contract_tn_edges(bound_connected_edges)
     for edge_key in edges_during_backtrack:
         if connected_edges[edge_key].node1.name == connected_edges[edge_key].node2.name:

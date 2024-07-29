@@ -15,12 +15,13 @@ def pauli_to_binary_vector(pauli_string):
     binary_vector = [0] * (2 * length)
 
     for i, char in enumerate(pauli_string):
-        if char in ['X', 'Y']:
+        if char in ["X", "Y"]:
             binary_vector[i] = 1  # X or Y present, set corresponding X part
-        if char in ['Z', 'Y']:
+        if char in ["Z", "Y"]:
             binary_vector[length + i] = 1  # Z or Y present, set corresponding Z part
 
     return binary_vector
+
 
 # Example usage
 # pauli_string = 'IIXXZYXI'
@@ -39,6 +40,7 @@ def batch_convert_to_binary_vectors(stabilizers):
     list: A list of binary vectors corresponding to the Pauli operator strings.
     """
     return [pauli_to_binary_vector(stabilizer) for stabilizer in stabilizers]
+
 
 # Example usage
 # Assuming stabilizers is the list obtained from the collect_stabilizers function
@@ -59,6 +61,7 @@ def apply_mod2_sum(e, stabilizers_and_logical, lambda_values):
             result = np.bitwise_xor(result, stabilizer)
 
     return result
+
 
 # Example usage
 # e = np.array([1, 1, 0, 0, 1])
@@ -87,15 +90,16 @@ def binary_vector_to_pauli(binary_vector):
 
     for i in range(length):
         if binary_vector[i] == 0 and binary_vector[length + i] == 0:
-            pauli_string += 'I'
+            pauli_string += "I"
         elif binary_vector[i] == 1 and binary_vector[length + i] == 0:
-            pauli_string += 'X'
+            pauli_string += "X"
         elif binary_vector[i] == 0 and binary_vector[length + i] == 1:
-            pauli_string += 'Z'
+            pauli_string += "Z"
         elif binary_vector[i] == 1 and binary_vector[length + i] == 1:
-            pauli_string += 'Y'
+            pauli_string += "Y"
 
     return pauli_string
+
 
 # Example usage
 # binary_vector = [0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0]
@@ -118,10 +122,10 @@ def unfilter_pauli_operator_list(A, B):
     B_idx = 0
 
     for a_char in A:
-        if a_char == 'I':
-            C.append('I')
+        if a_char == "I":
+            C.append("I")
         else:
             C.append(B[B_idx])
             B_idx += 1
 
-    return ''.join(C)
+    return "".join(C)

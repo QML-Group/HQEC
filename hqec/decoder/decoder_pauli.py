@@ -1,9 +1,12 @@
 import copy
 import math
-import numpy as np
 import os
-import psutil
 import random
+from multiprocessing import Pool, Process, Queue
+
+import numpy as np
+import psutil
+from gurobipy import GRB, Model, and_, or_
 
 from hqec.decoder.mod2_algebra import (
     find_kj_that_anticommutes_with_jth_row_only,
@@ -19,27 +22,20 @@ from hqec.operator_processor import (
     binary_vector_to_pauli,
     pauli_to_binary_vector,
 )
-from hqec.operator_push.push_toolbox import push_operator
 from hqec.operator_push.export_toolbox import extract_tensor_info
+from hqec.operator_push.push_toolbox import push_operator
 from hqec.operator_push.tensor_toolbox import get_tensor_from_id
-from multiprocessing import Process, Queue, Pool
-from gurobipy import GRB, Model, or_, and_
 
 
 def minimize_error_operator_weight(
-    e,
-    stabilizers_and_logical,
-    time_limit=None,
-    mip_focus=0,
-    heuristics=0,
-    output_flag=0
+    e, stabilizers_and_logical, time_limit=None, mip_focus=0, heuristics=0, output_flag=0
 ):
     # Create model
     model = Model("minimize_logical_operator_weight")
 
-    model.setParam('NodefileStart', 32)  # GB
+    model.setParam("NodefileStart", 32)  # GB
 
-    model.setParam('OutputFlag', output_flag)
+    model.setParam("OutputFlag", output_flag)
 
     # Set parameters
     if time_limit is not None:
@@ -63,7 +59,8 @@ def minimize_error_operator_weight(
     for i in range(len(e)):
         # Calculate the weighted sum of stabilizers.
         stabilizer_sum = sum(
-            stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical)))
+            stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical))
+        )
         # Add linear constraints for modulo-2 arithmetic.
         model.addConstr(z[i] + 2 * u[i] == stabilizer_sum + e[i])
 
@@ -79,16 +76,17 @@ def minimize_error_operator_weight(
     # Print the results.
     if bool(output_flag):
         for var in lambda_vars.values():
-            print(f'{var.varName} = {var.x}')
-        print(f'Weight (wt) of the new logical operator: {model.objVal}')
+            print(f"{var.varName} = {var.x}")
+        print(f"Weight (wt) of the new logical operator: {model.objVal}")
         if model.status == GRB.OPTIMAL:
             print("OPTIMAL")
         else:
-            print('No optimal solution found')
+            print("No optimal solution found")
 
     # Return lambda values
     lambda_values = [var.x for var in lambda_vars.values()]
     return lambda_values
+
 
 # Example usage
 # e = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
@@ -101,14 +99,15 @@ def minimize_error_operator_weight(
 # minimize_logical_operator_weight(L, stabilizers)
 
 
-def minimize_error_operator_weight_y2(e, stabilizers_and_logical, time_limit=None, mip_focus=0, heuristics=0,
-                                   output_flag=0):
+def minimize_error_operator_weight_y2(
+    e, stabilizers_and_logical, time_limit=None, mip_focus=0, heuristics=0, output_flag=0
+):
     # Create model
     model = Model("minimize_logical_operator_weight")
 
-    model.setParam('OutputFlag', output_flag)
+    model.setParam("OutputFlag", output_flag)
 
-    model.setParam('NodefileStart', 32)  # GB
+    model.setParam("NodefileStart", 32)  # GB
 
     # Set parameters
     if time_limit is not None:
@@ -128,7 +127,9 @@ def minimize_error_operator_weight_y2(e, stabilizers_and_logical, time_limit=Non
     # Add constraints to the new logical operations for each element, ensuring modulo-2 arithmetic.
     for i in range(len(e)):
         # Calculate the weighted sum of stabilizers.
-        stabilizer_sum = sum(stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical)))
+        stabilizer_sum = sum(
+            stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical))
+        )
         # Add linear constraints for modulo-2 arithmetic.
         model.addConstr(z[i] + 2 * u[i] == stabilizer_sum + e[i])
 
@@ -141,16 +142,17 @@ def minimize_error_operator_weight_y2(e, stabilizers_and_logical, time_limit=Non
     # Print the results.
     if bool(output_flag):
         for var in lambda_vars.values():
-            print(f'{var.varName} = {var.x}')
-        print(f'Weight (wt) of the new logical operator: {model.objVal}')
+            print(f"{var.varName} = {var.x}")
+        print(f"Weight (wt) of the new logical operator: {model.objVal}")
         if model.status == GRB.OPTIMAL:
             print("OPTIMAL")
         else:
-            print('No optimal solution found')
+            print("No optimal solution found")
 
     # Return lambda values
     lambda_values = [var.x for var in lambda_vars.values()]
     return lambda_values
+
 
 # Example usage
 # e = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
@@ -163,14 +165,15 @@ def minimize_error_operator_weight_y2(e, stabilizers_and_logical, time_limit=Non
 # minimize_logical_operator_weight(L, stabilizers)
 
 
-def minimize_error_operator_weight_optimal(e, stabilizers_and_logical, a, b, c, time_limit=None, mip_focus=0,
-                                           heuristics=0, output_flag=0):
+def minimize_error_operator_weight_optimal(
+    e, stabilizers_and_logical, a, b, c, time_limit=None, mip_focus=0, heuristics=0, output_flag=0
+):
     # Create model
     model = Model("minimize_logical_operator_weight_optimal")
 
-    model.setParam('OutputFlag', output_flag)
+    model.setParam("OutputFlag", output_flag)
 
-    model.setParam('NodefileStart', 32)  # GB
+    model.setParam("NodefileStart", 32)  # GB
 
     # Set parameters
     if time_limit is not None:
@@ -193,7 +196,9 @@ def minimize_error_operator_weight_optimal(e, stabilizers_and_logical, a, b, c, 
     # Add constraints to the new logical operations for each element, ensuring modulo-2 arithmetic.
     for i in range(len(e)):
         # Calculate the weighted sum of stabilizers.
-        stabilizer_sum = sum(stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical)))
+        stabilizer_sum = sum(
+            stabilizers_and_logical[j][i] * lambda_vars[j] for j in range(len(stabilizers_and_logical))
+        )
         # Add linear constraints for modulo-2 arithmetic.
         model.addConstr(z[i] + 2 * u[i] == stabilizer_sum + e[i])
 
@@ -201,7 +206,7 @@ def minimize_error_operator_weight_optimal(e, stabilizers_and_logical, a, b, c, 
         model.addConstr(v[i] == and_(z[i], z[i + half_l]))
 
     # Set the objective function to minimize Hamming weight.
-    model.setObjective(sum(a*z[i] + c*v[i] + b*z[i+half_l] for i in range(half_l)), GRB.MINIMIZE)
+    model.setObjective(sum(a * z[i] + c * v[i] + b * z[i + half_l] for i in range(half_l)), GRB.MINIMIZE)
 
     # Solve the model.
     model.optimize()
@@ -209,16 +214,17 @@ def minimize_error_operator_weight_optimal(e, stabilizers_and_logical, a, b, c, 
     # Print the results.
     if bool(output_flag):
         for var in lambda_vars.values():
-            print(f'{var.varName} = {var.x}')
-        print(f'Weight (wt) of the new logical operator: {model.objVal}')
+            print(f"{var.varName} = {var.x}")
+        print(f"Weight (wt) of the new logical operator: {model.objVal}")
         if model.status == GRB.OPTIMAL:
             print("OPTIMAL")
         else:
-            print('No optimal solution found')
+            print("No optimal solution found")
 
     # Return lambda values
     lambda_values = [var.x for var in lambda_vars.values()]
     return lambda_values
+
 
 # Example usage
 # e = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
@@ -278,6 +284,7 @@ def calculate_syndrome(stabilizer_matrix, pauli_error_vector):
     syndrome_vector = swap_and_mod2_multiply(stabilizer_matrix, error_vector_np)
     return syndrome_vector
 
+
 # Example usage
 # stabilizer_matrix = np.array([
 #     [1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0],
@@ -290,8 +297,21 @@ def calculate_syndrome(stabilizer_matrix, pauli_error_vector):
 # print(syndrome_vector)
 
 
-def decoding_process(queue, px, py, pz, stabilizers, stabilizer_matrix, stabilizers_and_logical, f, n, time_limit,
-                     mip_focus, heuristics, output_flag):
+def decoding_process(
+    queue,
+    px,
+    py,
+    pz,
+    stabilizers,
+    stabilizer_matrix,
+    stabilizers_and_logical,
+    f,
+    n,
+    time_limit,
+    mip_focus,
+    heuristics,
+    output_flag,
+):
     try:
         # Generate a random Pauli error vector
         e_0 = generate_pauli_error_vector(px, py, pz, n)
@@ -306,9 +326,14 @@ def decoding_process(queue, px, py, pz, stabilizers, stabilizer_matrix, stabiliz
         # print(f"e: {e}, type {type(e)}")
 
         # Try to minimize the weight of the error operator
-        lambda_values = minimize_error_operator_weight(list(e), stabilizers_and_logical,
-                                                       time_limit=time_limit, mip_focus=mip_focus,
-                                                       heuristics=heuristics, output_flag=output_flag)
+        lambda_values = minimize_error_operator_weight(
+            list(e),
+            stabilizers_and_logical,
+            time_limit=time_limit,
+            mip_focus=mip_focus,
+            heuristics=heuristics,
+            output_flag=output_flag,
+        )
 
         lambda_values_int = np.round(lambda_values).astype(int)
 
@@ -324,8 +349,22 @@ def decoding_process(queue, px, py, pz, stabilizers, stabilizer_matrix, stabiliz
         queue.put(False)
 
 
-def decoding_iteration(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix, stabilizers_and_logical, f, n,
-                       time_limit, mip_focus, heuristics, output_flag, affinity=None, pass_all_info=False):
+def decoding_iteration(
+    px,
+    py,
+    pz,
+    stabilizers_and_other_logs,
+    stabilizer_matrix,
+    stabilizers_and_logical,
+    f,
+    n,
+    time_limit,
+    mip_focus,
+    heuristics,
+    output_flag,
+    affinity=None,
+    pass_all_info=False,
+):
     try:
         # Set CPU affinity for the process if specified
         if affinity is not None:
@@ -350,21 +389,34 @@ def decoding_iteration(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix
                 py = 0
             if pz < 0:
                 pz = 0
-            wtx = math.log(px+1e-300, p_ele)
-            wty = math.log(py+1e-300, p_ele)
-            wtz = math.log(pz+1e-300, p_ele)
+            wtx = math.log(px + 1e-300, p_ele)
+            wty = math.log(py + 1e-300, p_ele)
+            wtz = math.log(pz + 1e-300, p_ele)
             a = wtx
             b = wtz
             c = wty - a - b
             # Minimize the weight of the error operator
-            lambda_values = minimize_error_operator_weight_optimal(list(e), stabilizers_and_logical, a=a, b=b, c=c,
-                                                                   time_limit=time_limit, mip_focus=mip_focus,
-                                                                   heuristics=heuristics, output_flag=output_flag)
+            lambda_values = minimize_error_operator_weight_optimal(
+                list(e),
+                stabilizers_and_logical,
+                a=a,
+                b=b,
+                c=c,
+                time_limit=time_limit,
+                mip_focus=mip_focus,
+                heuristics=heuristics,
+                output_flag=output_flag,
+            )
         else:
             # Minimize the weight of the error operator
-            lambda_values = minimize_error_operator_weight(list(e), stabilizers_and_logical,
-                                                           time_limit=time_limit, mip_focus=mip_focus,
-                                                           heuristics=heuristics, output_flag=output_flag)
+            lambda_values = minimize_error_operator_weight(
+                list(e),
+                stabilizers_and_logical,
+                time_limit=time_limit,
+                mip_focus=mip_focus,
+                heuristics=heuristics,
+                output_flag=output_flag,
+            )
 
         lambda_values_int = np.round(lambda_values).astype(int)
 
@@ -379,10 +431,26 @@ def decoding_iteration(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix
         return False
 
 
-def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logical_xs, logical_zs, logical_x,
-                                                  logical_z, px, py, pz, N, n_process, cpu_affinity_list=None,
-                                                  time_limit=None, mip_focus=0, heuristics=0, output_flag=0, f=None,
-                                                  pass_all_info=False):
+def quantum_error_correction_decoder_multiprocess(
+    tensor_list,
+    stabilizers,
+    logical_xs,
+    logical_zs,
+    logical_x,
+    logical_z,
+    px,
+    py,
+    pz,
+    N,
+    n_process,
+    cpu_affinity_list=None,
+    time_limit=None,
+    mip_focus=0,
+    heuristics=0,
+    output_flag=0,
+    f=None,
+    pass_all_info=False,
+):
     stabilizers_binary = batch_convert_to_binary_vectors(stabilizers)
     logical_xs_binary = batch_convert_to_binary_vectors(logical_xs)
     logical_zs_binary = batch_convert_to_binary_vectors(logical_zs)
@@ -396,8 +464,25 @@ def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logi
     stabilizers_and_other_logs.remove(logical_x)
     stabilizers_and_other_logs.remove(logical_z)
 
-    args = [(px, py, pz, stabilizers_and_other_logs, stabilizer_matrix, stabilizers_and_logical, f, n, time_limit,
-             mip_focus, heuristics, output_flag, cpu_affinity_list, pass_all_info) for _ in range(N)]
+    args = [
+        (
+            px,
+            py,
+            pz,
+            stabilizers_and_other_logs,
+            stabilizer_matrix,
+            stabilizers_and_logical,
+            f,
+            n,
+            time_limit,
+            mip_focus,
+            heuristics,
+            output_flag,
+            cpu_affinity_list,
+            pass_all_info,
+        )
+        for _ in range(N)
+    ]
 
     successful_decodings = 0
     with Pool(n_process) as pool:
@@ -408,13 +493,24 @@ def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logi
     return success_rate
 
 
-# 使用方法
 # success_rate = quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logical_xs, logical_zs, px, py, pz, N, n_process)
 # print(f"Decoding success rate: {success_rate}")
 
 
-def quantum_error_correction_decoder(tensor_list, stabilizers, logical_xs, logical_zs, px, py, pz, N,
-                                     time_limit=None, mip_focus=0, heuristics=0, output_flag=0):
+def quantum_error_correction_decoder(
+    tensor_list,
+    stabilizers,
+    logical_xs,
+    logical_zs,
+    px,
+    py,
+    pz,
+    N,
+    time_limit=None,
+    mip_focus=0,
+    heuristics=0,
+    output_flag=0,
+):
     # Convert stabilizers and logical operators to binary vectors
     stabilizers_binary = batch_convert_to_binary_vectors(stabilizers)
     logical_xs_binary = batch_convert_to_binary_vectors(logical_xs)
@@ -435,9 +531,24 @@ def quantum_error_correction_decoder(tensor_list, stabilizers, logical_xs, logic
     for _ in range(N):
         while True:  # 使用循环来允许重试
             queue = Queue()
-            p = Process(target=decoding_process, args=(
-                queue, px, py, pz, stabilizers, stabilizer_matrix, stabilizers_and_logical, f, n, time_limit,
-                mip_focus, heuristics, output_flag))
+            p = Process(
+                target=decoding_process,
+                args=(
+                    queue,
+                    px,
+                    py,
+                    pz,
+                    stabilizers,
+                    stabilizer_matrix,
+                    stabilizers_and_logical,
+                    f,
+                    n,
+                    time_limit,
+                    mip_focus,
+                    heuristics,
+                    output_flag,
+                ),
+            )
             p.start()
             p.join()
 
@@ -457,6 +568,7 @@ def quantum_error_correction_decoder(tensor_list, stabilizers, logical_xs, logic
     # Calculate and return the decoding success rate
     success_rate = successful_decodings / N
     return success_rate
+
 
 # Example usage
 # Define your stabilizers, logical_xs, logical_zs
@@ -489,22 +601,6 @@ def is_error_equivalent(stabilizers, e_0, e_bar):
     return True  # No such row found, recovery is possible
 
 
-def calculate_pauli_weight(pauli_string):
-    """
-    Calculate the weight of a Pauli operator string.
-
-    Args:
-    pauli_string (str): A string of Pauli operators (I, X, Z, Y).
-
-    Returns:
-    int: The weight of the Pauli string (number of non-I operators).
-    """
-    weight = 0
-    for char in pauli_string:
-        if char != 'I':
-            weight += 1
-    return weight
-
 # Example
 # pauli_string = 'IIXXZYXI'
 # weight = calculate_pauli_weight(pauli_string)
@@ -524,10 +620,11 @@ def filter_pauli_operator_list(A, B):
     """
     filtered_B = []
     for pauli_string in B:
-        filtered_string = ''.join(pauli_char for a_char, pauli_char in zip(A, pauli_string) if a_char != 'I')
+        filtered_string = "".join(pauli_char for a_char, pauli_char in zip(A, pauli_string) if a_char != "I")
         filtered_B.append(filtered_string)
 
     return filtered_B
+
 
 # Example usage
 # A = 'IXZI'
@@ -541,23 +638,26 @@ def create_f(tensor_list):
     f_list = []
     for current_tensor in tensor_list:
         current_tensor_id = current_tensor.tensor_id
-        formatted_ups_list, formatted_stabilizer_list = get_formatted_ups_and_stabilizers(tensor_info_dict,
-                                                                                          current_tensor_id)
+        formatted_ups_list, formatted_stabilizer_list = get_formatted_ups_and_stabilizers(
+            tensor_info_dict, current_tensor_id
+        )
         binary_formatted_ups_list = batch_convert_to_binary_vectors(formatted_ups_list)
         np_binary_formatted_ups_list = np.array(binary_formatted_ups_list)
         binary_formatted_stabilizer_list = batch_convert_to_binary_vectors(formatted_stabilizer_list)
         np_binary_formatted_stabilizer_list = np.array(binary_formatted_stabilizer_list)
         if len(np_binary_formatted_stabilizer_list) == 0:
             continue
-        current_zero_columns_in_stabilizers_index_list = find_zero_columns_in_pairs(
-            np_binary_formatted_stabilizer_list)
+        current_zero_columns_in_stabilizers_index_list = find_zero_columns_in_pairs(np_binary_formatted_stabilizer_list)
         print(current_zero_columns_in_stabilizers_index_list)
         for current_binary_formatted_stabilizer in binary_formatted_stabilizer_list:
             current_binary_formatted_stabilizer_index_in_ups_list = binary_formatted_ups_list.index(
-                current_binary_formatted_stabilizer)
-            np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only\
-                (np_binary_formatted_ups_list, current_binary_formatted_stabilizer_index_in_ups_list,
-                 current_zero_columns_in_stabilizers_index_list)
+                current_binary_formatted_stabilizer
+            )
+            np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only(
+                np_binary_formatted_ups_list,
+                current_binary_formatted_stabilizer_index_in_ups_list,
+                current_zero_columns_in_stabilizers_index_list,
+            )
             if np_current_local_binary_kj is None:
                 current_layer = current_tensor.layer
                 current_zero_columns_in_stabilizers_index_list = []
@@ -571,9 +671,11 @@ def create_f(tensor_list):
                     if leg.logical:
                         current_zero_columns_in_stabilizers_index_list.append(leg_id)
                         current_zero_columns_in_stabilizers_index_list.append(leg_id + len(current_tensor.legs))
-                np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only \
-                    (np_binary_formatted_ups_list, current_binary_formatted_stabilizer_index_in_ups_list,
-                     current_zero_columns_in_stabilizers_index_list)
+                np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only(
+                    np_binary_formatted_ups_list,
+                    current_binary_formatted_stabilizer_index_in_ups_list,
+                    current_zero_columns_in_stabilizers_index_list,
+                )
                 print(current_zero_columns_in_stabilizers_index_list)
 
             current_local_binary_kj = list(np_current_local_binary_kj)

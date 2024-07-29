@@ -1,10 +1,12 @@
-import random
-import numpy as np
-from hqec.operator_processor import batch_convert_to_binary_vectors
-from hqec.decoder.mod2_algebra import mod2_gaussian_elimination
 import multiprocessing
+import random
 from multiprocessing import Pool, current_process
+
+import numpy as np
 import psutil
+
+from hqec.decoder.mod2_algebra import mod2_gaussian_elimination
+from hqec.operator_processor import batch_convert_to_binary_vectors
 
 
 def filter_pauli_strings_by_erasure(pauli_strings, erasure_vector):
@@ -29,6 +31,7 @@ def filter_pauli_strings_by_erasure(pauli_strings, erasure_vector):
 
     return filtered_strings
 
+
 # Example usage
 # pauli_strings = ['IXYZ', 'ZZXY', 'YXIZ']
 # erasure_vector = [0, 1, 1, 0]  # Assuming erasure errors at positions 1 and 2
@@ -48,6 +51,7 @@ def generate_erasure_vector(p, n):
     list: Erasure vector of length n.
     """
     return [1 if random.random() < p else 0 for _ in range(n)]
+
 
 # Example usage
 # p = 0.2  # Example probability
@@ -71,12 +75,13 @@ def generate_fixed_weight_erasure_vector(k, n):
         raise ValueError("Number of erasures cannot be greater than the vector length.")
 
     # Create a list with k 1s and (n-k) 0s
-    erasure_vector = [1]*k + [0]*(n-k)
+    erasure_vector = [1] * k + [0] * (n - k)
 
     # Shuffle the list to randomize the positions of 1s and 0s
     random.shuffle(erasure_vector)
 
     return erasure_vector
+
 
 # Example usage
 # k = 3  # Number of erasures
@@ -167,6 +172,7 @@ def calculate_recovery_rate_multiprocessing(n, p, stabilizers, logical_operators
     successful_recoveries = sum(results)
     return successful_recoveries / n
 
+
 # Example usage:
 # n = 1000  # Number of repetitions
 # p = 0.1  # Probability of a single qubit error
@@ -178,7 +184,9 @@ def calculate_recovery_rate_multiprocessing(n, p, stabilizers, logical_operators
 # print(f"Decoding success rate: {success_rate}")
 
 
-def calculate_recovery_rate_fixed_weight_multiprocessing(n, k, stabilizers, logical_operators, use_multiprocessing=False):
+def calculate_recovery_rate_fixed_weight_multiprocessing(
+    n, k, stabilizers, logical_operators, use_multiprocessing=False
+):
     """
     Calculate the recovery rate from fixed weight erasure errors using multiprocessing.
 
@@ -208,6 +216,7 @@ def calculate_recovery_rate_fixed_weight_multiprocessing(n, k, stabilizers, logi
 
     successful_recoveries = sum(results)
     return successful_recoveries / n
+
 
 # Example usage
 # n = 1000
@@ -278,8 +287,9 @@ def calculate_recovery_rate(n, p, stabilizers, logical_operators):
     return successful_recoveries / n
 
 
-def calculate_recovery_rates_for_p_range(n, p_start, p_end, p_step, stabilizers, logical_operators,
-                                         n_process=1, cpu_affinity_list=None):
+def calculate_recovery_rates_for_p_range(
+    n, p_start, p_end, p_step, stabilizers, logical_operators, n_process=1, cpu_affinity_list=None
+):
     """
     Calculate the recovery rates for a range of erasure probabilities with multiple logical operators,
     optionally using multiprocessing for improved performance.
@@ -300,13 +310,18 @@ def calculate_recovery_rates_for_p_range(n, p_start, p_end, p_step, stabilizers,
     recovery_rates = []
     for p in np.arange(p_start, p_end + p_step, p_step):
         print(f"Running at p = {p}")
-        recovery_rate = calculate_recovery_rate_multiprocessing(n=n, p=p, stabilizers=stabilizers,
-                                                                logical_operators=logical_operators,
-                                                                n_process=n_process,
-                                                                cpu_affinity_list=cpu_affinity_list)
+        recovery_rate = calculate_recovery_rate_multiprocessing(
+            n=n,
+            p=p,
+            stabilizers=stabilizers,
+            logical_operators=logical_operators,
+            n_process=n_process,
+            cpu_affinity_list=cpu_affinity_list,
+        )
         recovery_rates.append((p, recovery_rate))
 
     return recovery_rates
+
 
 # Example usage with multiprocessing:
 # n = 1000  # Number of repetitions
@@ -321,4 +336,3 @@ def calculate_recovery_rates_for_p_range(n, p_start, p_end, p_step, stabilizers,
 #                                              n_process, cpu_affinity_list)
 # for rate in rates:
 #     print(f"Probability: {rate[0]}, Recovery Rate: {rate[1]}")
-

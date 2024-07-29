@@ -13,19 +13,20 @@ def process_quantum_csv(file_path):
     """
     tensor_dict = {}
 
-    with open(file_path, newline='') as csvfile:
+    with open(file_path, newline="") as csvfile:
         csv_reader = csv.reader(csvfile)
         for row in csv_reader:
             tensor_id = row[0]
             operators = {}
 
             for operator in row[1:]:
-                op_type, op_value = operator.split('=')
+                op_type, op_value = operator.split("=")
                 operators[op_type.strip()] = op_value.strip()
 
             tensor_dict[tensor_id] = operators
 
     return tensor_dict
+
 
 # Example usage
 # Note: The actual file path should be provided here
@@ -48,10 +49,11 @@ def collect_stabilizers(tensor_dict):
 
     for operators in tensor_dict.values():
         for op_type, op_value in operators.items():
-            if 'stabilizer' in op_type:
+            if "stabilizer" in op_type:
                 stabilizers.append(op_value)
 
     return stabilizers
+
 
 # Example usage
 # Assuming tensor_data is the dictionary obtained from the process_quantum_csv function
@@ -73,10 +75,11 @@ def collect_logical_zs(tensor_dict):
 
     for operators in tensor_dict.values():
         for op_type, op_value in operators.items():
-            if 'logical_z' in op_type:
+            if "logical_z" in op_type:
                 logical_zs.append(op_value)
 
     return logical_zs
+
 
 # Example usage
 # Assuming tensor_data is the dictionary obtained from the process_quantum_csv function
@@ -98,10 +101,11 @@ def collect_logical_xs(tensor_dict):
 
     for operators in tensor_dict.values():
         for op_type, op_value in operators.items():
-            if 'logical_x' in op_type:
+            if "logical_x" in op_type:
                 logical_xs.append(op_value)
 
     return logical_xs
+
 
 # Example usage
 # Assuming tensor_data is the dictionary obtained from the process_quantum_csv function
@@ -121,7 +125,7 @@ def read_tensor_layers_from_csv(file_path):
     """
     tensor_layers = {}
 
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         reader = csv.reader(file)
         next(reader)  # Skip the header row
         for row in reader:
@@ -129,6 +133,7 @@ def read_tensor_layers_from_csv(file_path):
             tensor_layers[int(tensor_id)] = int(layer_number)
 
     return tensor_layers
+
 
 # Example usage
 # file_path = 'path_to_your_csv_file.csv'
@@ -144,10 +149,11 @@ def get_formatted_ups_and_stabilizers(tensor_info, tensor_id):
     ups_list = tensor_info[tensor_id]["ups_list"]
     stabilizer_list = tensor_info[tensor_id]["stabilizer_list"]
 
-    formatted_ups_list = [''.join(ups) for ups in ups_list]
-    formatted_stabilizer_list = [''.join(stabilizer) for stabilizer in stabilizer_list]
+    formatted_ups_list = ["".join(ups) for ups in ups_list]
+    formatted_stabilizer_list = ["".join(stabilizer) for stabilizer in stabilizer_list]
 
     return formatted_ups_list, formatted_stabilizer_list
+
 
 # Example usage:
 # Assuming tensor_info_dict is the output from the extract_tensor_info function
@@ -166,8 +172,8 @@ def extract_stabilizers_from_result_dict(result_dict):
     """
     stabilizers_list = []
     for key in result_dict:
-        if 'stabilizers' in result_dict[key]:
-            stabilizers = result_dict[key]['stabilizers']
+        if "stabilizers" in result_dict[key]:
+            stabilizers = result_dict[key]["stabilizers"]
             stabilizers_list.extend(stabilizers.values())
 
     return stabilizers_list
@@ -186,11 +192,11 @@ def extract_logicals_from_result_dict(result_dict):
     logical_xs = []
     logical_zs = []
     for key in result_dict:
-        if 'logical_x' in result_dict[key]:
-            logical_x = result_dict[key]['logical_x']
+        if "logical_x" in result_dict[key]:
+            logical_x = result_dict[key]["logical_x"]
             logical_xs.extend(logical_x.values())
-        if 'logical_z' in result_dict[key]:
-            logical_z = result_dict[key]['logical_z']
+        if "logical_z" in result_dict[key]:
+            logical_z = result_dict[key]["logical_z"]
             logical_zs.extend(logical_z.values())
 
     return logical_zs, logical_xs

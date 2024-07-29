@@ -1,8 +1,19 @@
-from hqec.operator_push.hypertiling_compatibility.srg_to_htn import generate_tiling_with_layers, create_directed_polygons, generate_poly_id_mapping, \
-    generate_tensors_for_all_polys, \
-    update_all_tensor_connections, swap_legs_for_same_layer_neighbor
+from hqec.operator_push.hypertiling_compatibility.srg_to_htn import (
+    create_directed_polygons,
+    generate_poly_id_mapping,
+    generate_tensors_for_all_polys,
+    generate_tiling_with_layers,
+    swap_legs_for_same_layer_neighbor,
+    update_all_tensor_connections,
+)
 from hqec.operator_push.network_toolbox import assign_layers_to_tensors
-from hqec.operator_push.tensor_toolbox import add_logical_legs, traverse_h_gate, get_tensor_from_id, swap_tensor_legs, Tensor
+from hqec.operator_push.tensor_toolbox import (
+    Tensor,
+    add_logical_legs,
+    get_tensor_from_id,
+    swap_tensor_legs,
+    traverse_h_gate,
+)
 
 
 def setup_htn(l):
@@ -23,8 +34,9 @@ def setup_htn(l):
     tensor_list = []
 
     # Create and connect tensors
-    generate_tensors_for_all_polys(directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping,
-                                   tensor_list=tensor_list)
+    generate_tensors_for_all_polys(
+        directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping, tensor_list=tensor_list
+    )
     update_all_tensor_connections(tensor_list)
 
     # Assign layer to tensors
@@ -40,11 +52,11 @@ def setup_htn(l):
     traverse_h_gate(tensor_list)
 
     # Define UPS generators
-    UPS1 = ['X', 'X', 'X', 'X', 'I']
-    UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-    UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-    UPS4 = ['I', 'X', 'I', 'X', 'X']
-    UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+    UPS1 = ["X", "X", "X", "X", "I"]
+    UPS2 = ["Z", "I", "Z", "I", "I"]
+    UPS3 = ["I", "Z", "I", "Z", "I"]
+    UPS4 = ["I", "X", "I", "X", "X"]
+    UPS5 = ["I", "I", "Z", "Z", "Z"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -106,11 +118,11 @@ def setup_htn_z_fixed(l):
         # Add logical legs
         add_logical_legs(tensor_list, 0, 1)
         # Define UPS generators
-        UPS1 = ['X', 'X', 'X', 'X', 'I']
-        UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-        UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-        UPS4 = ['I', 'X', 'I', 'X', 'X']
-        UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+        UPS1 = ["X", "X", "X", "X", "I"]
+        UPS2 = ["Z", "I", "Z", "I", "I"]
+        UPS3 = ["I", "Z", "I", "Z", "I"]
+        UPS4 = ["I", "X", "I", "X", "X"]
+        UPS5 = ["I", "I", "Z", "Z", "Z"]
         tensor_0.ups_list = [UPS1, UPS2, UPS3, UPS4, UPS5]
         tensor_0.stabilizer_list = [UPS1, UPS2, UPS3]
         tensor_0.logical_z_list = [UPS5]
@@ -118,11 +130,10 @@ def setup_htn_z_fixed(l):
         tensor_0.all_ups = [UPS1, UPS2, UPS3, UPS4, UPS5]
         return tensor_list
 
-
-
     # Create and connect tensors
-    generate_tensors_for_all_polys(directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping,
-                                   tensor_list=tensor_list)
+    generate_tensors_for_all_polys(
+        directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping, tensor_list=tensor_list
+    )
     update_all_tensor_connections(tensor_list)
 
     # Assign layer to tensors
@@ -138,18 +149,18 @@ def setup_htn_z_fixed(l):
     traverse_h_gate(tensor_list)
 
     # Define UPS generators
-    UPS1 = ['X', 'X', 'X', 'X', 'I']
-    UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-    UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-    UPS4 = ['I', 'X', 'I', 'X', 'X']
-    UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+    UPS1 = ["X", "X", "X", "X", "I"]
+    UPS2 = ["Z", "I", "Z", "I", "I"]
+    UPS3 = ["I", "Z", "I", "Z", "I"]
+    UPS4 = ["I", "X", "I", "X", "X"]
+    UPS5 = ["I", "I", "Z", "Z", "Z"]
 
     # Define UPS generators
-    UPSb1 = ['X', 'X', 'X', 'X']
-    UPSb2 = ['Z', 'I', 'Z', 'I']
-    UPSb3 = ['I', 'Z', 'I', 'Z']
-    UPSb4 = ['I', 'X', 'I', 'X']
-    UPSb5 = ['I', 'I', 'Z', 'Z']
+    UPSb1 = ["X", "X", "X", "X"]
+    UPSb2 = ["Z", "I", "Z", "I"]
+    UPSb3 = ["I", "Z", "I", "Z"]
+    UPSb4 = ["I", "X", "I", "X"]
+    UPSb5 = ["I", "I", "Z", "Z"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -218,11 +229,11 @@ def setup_htn_y_fixed(l):
         # Add logical legs
         add_logical_legs(tensor_list, 0, 1)
         # Define UPS generators
-        UPS1 = ['X', 'X', 'X', 'X', 'I']
-        UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-        UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-        UPS4 = ['I', 'X', 'I', 'X', 'X']
-        UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+        UPS1 = ["X", "X", "X", "X", "I"]
+        UPS2 = ["Z", "I", "Z", "I", "I"]
+        UPS3 = ["I", "Z", "I", "Z", "I"]
+        UPS4 = ["I", "X", "I", "X", "X"]
+        UPS5 = ["I", "I", "Z", "Z", "Z"]
         tensor_0.ups_list = [UPS1, UPS2, UPS3, UPS4, UPS5]
         tensor_0.stabilizer_list = [UPS1, UPS2, UPS3]
         tensor_0.logical_z_list = [UPS5]
@@ -230,11 +241,10 @@ def setup_htn_y_fixed(l):
         tensor_0.all_ups = [UPS1, UPS2, UPS3, UPS4, UPS5]
         return tensor_list
 
-
-
     # Create and connect tensors
-    generate_tensors_for_all_polys(directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping,
-                                   tensor_list=tensor_list)
+    generate_tensors_for_all_polys(
+        directed_polygons=directed_polygons, poly_id_mapping=poly_id_mapping, tensor_list=tensor_list
+    )
     update_all_tensor_connections(tensor_list)
 
     # Assign layer to tensors
@@ -250,19 +260,19 @@ def setup_htn_y_fixed(l):
     traverse_h_gate(tensor_list)
 
     # Define UPS generators
-    UPS1 = ['X', 'X', 'X', 'X', 'I']
-    UPS2 = ['Z', 'I', 'Z', 'I', 'I']
-    UPS3 = ['I', 'Z', 'I', 'Z', 'I']
-    UPS4 = ['I', 'X', 'I', 'X', 'X']
-    UPS5 = ['I', 'I', 'Z', 'Z', 'Z']
+    UPS1 = ["X", "X", "X", "X", "I"]
+    UPS2 = ["Z", "I", "Z", "I", "I"]
+    UPS3 = ["I", "Z", "I", "Z", "I"]
+    UPS4 = ["I", "X", "I", "X", "X"]
+    UPS5 = ["I", "I", "Z", "Z", "Z"]
 
     # Define UPS generators
-    UPSb1 = ['X', 'X', 'X', 'X']
-    UPSb2 = ['Z', 'I', 'Z', 'I']
-    UPSb3 = ['I', 'Z', 'I', 'Z']
-    UPSb4 = ['I', 'X', 'I', 'X']
-    UPSb5 = ['I', 'I', 'Z', 'Z']
-    UPSb6 = ['I', 'X', 'Z', 'Y']
+    UPSb1 = ["X", "X", "X", "X"]
+    UPSb2 = ["Z", "I", "Z", "I"]
+    UPSb3 = ["I", "Z", "I", "Z"]
+    UPSb4 = ["I", "X", "I", "X"]
+    UPSb5 = ["I", "I", "Z", "Z"]
+    UPSb6 = ["I", "X", "Z", "Y"]
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -307,6 +317,7 @@ def setup_htn_y_fixed(l):
                 tensor.all_ups = [UPSb1, UPSb2, UPSb3, UPSb5]
 
     return tensor_list
+
 
 # tl = setup_htn_z_fixed(l=1)
 # for t in tl:

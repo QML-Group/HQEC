@@ -5,20 +5,24 @@ import multiprocessing
 import os
 import tempfile
 
-from hqec.operator_push.tensor_toolbox import read_out_boundary, read_out_logical, collect_connected_leg_operators, \
-    unblock_children_legs, write_layer, reading_boundary_complete, get_tensor_from_id
-
+from hqec.operator_push.tensor_toolbox import (
+    collect_connected_leg_operators,
+    get_tensor_from_id,
+    read_out_boundary,
+    read_out_logical,
+    reading_boundary_complete,
+    unblock_children_legs,
+    write_layer,
+)
 
 # Config logging
 log_file_path = os.path.join(tempfile.gettempdir(), "push_toolbox.log")
 logging.basicConfig(
-    filename=log_file_path,
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    filename=log_file_path, level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Create a logger
-logger = logging.getLogger('push_toolbox')
+logger = logging.getLogger("push_toolbox")
 
 
 def auto_operator_push_decision(tensor_list, start_tensor_id, logger_mode=False):
@@ -50,8 +54,9 @@ def auto_operator_push_decision(tensor_list, start_tensor_id, logger_mode=False)
                 break
 
         # Execute operator_push_decision on the current tensor
-        tensor_for_ups_reconsider = current_tensor.operator_push_decision(tensor_list, tensors_for_current_round,
-                                                                          logger_mode=logger_mode)
+        tensor_for_ups_reconsider = current_tensor.operator_push_decision(
+            tensor_list, tensors_for_current_round, logger_mode=logger_mode
+        )
 
         if tensor_for_ups_reconsider is not None:
             if len(tensor_for_ups_reconsider) != 0:
@@ -92,7 +97,7 @@ def push_operator(tensor_list, ups, tensor_id, logger_mode=False):
     # Print information for each tensor, including leg connection details
     if logger_mode:
         logger.info(f"Starting from tensor {tensor_id}, aiming to push operator: {ups}")
-        logger.info('Tensors before pushing')
+        logger.info("Tensors before pushing")
         for tensor in tensor_list:
             logger.info(f"Tensor {tensor.tensor_id}:")
             logger.info(tensor)
@@ -103,24 +108,24 @@ def push_operator(tensor_list, ups, tensor_id, logger_mode=False):
 
     # Print information for each tensor, including leg connection details
     if logger_mode:
-        logger.info('Tensors after pushing')
+        logger.info("Tensors after pushing")
         for tensor in tensor_list:
             logger.info(f"Tensor {tensor.tensor_id}:")
             logger.info(tensor)
 
     internal, internal_string = collect_connected_leg_operators(tensor_list)
     print(f"Internal legs: {internal_string}")
-    if 'X' in internal_string or 'Z' in internal_string or 'Y' in internal_string:
+    if "X" in internal_string or "Z" in internal_string or "Y" in internal_string:
         raise ValueError("Non I internal leg")
     result = read_out_boundary(tensor_list, logger_mode=logger_mode)
     print(f"reading_boundary_complete: {reading_boundary_complete(tensor_list)}")
-    print(f'Result: {str(result)}')
+    print(f"Result: {str(result)}")
     logical = read_out_logical(tensor_list)
-    print(f'Logical: {str(logical)}')
+    print(f"Logical: {str(logical)}")
     if logger_mode:
         logger.info("\nStart reading out boundary operators")
-        logger.info(f'Result: {str(result)}')
-        logger.info(f'Logical: {str(logical)}')
+        logger.info(f"Result: {str(result)}")
+        logger.info(f"Logical: {str(logical)}")
 
     return str(result)
 
@@ -192,13 +197,13 @@ def push_distributed_operators(tensor_list, ups_tensor_id_list, logger_mode=Fals
 
     # Print information for each tensor, including leg connection details
     if logger_mode:
-        logger.info('Tensors after pushing')
+        logger.info("Tensors after pushing")
         for tensor in tensor_list:
             logger.info(f"Tensor {tensor.tensor_id}:")
             logger.info(tensor)
 
     internal, internal_string = collect_connected_leg_operators(tensor_list)
-    if 'X' in internal_string or 'Z' in internal_string or 'Y' in internal_string:
+    if "X" in internal_string or "Z" in internal_string or "Y" in internal_string:
         raise ValueError("Non I internal leg")
     result = read_out_boundary(tensor_list, logger_mode=logger_mode)
 
@@ -218,44 +223,45 @@ def batch_push(tensor_list, logger_mode=False):
         for index, ups in enumerate(tensor.stabilizer_list):
             temp_tensor_list = copy.deepcopy(tensor_list)
             result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-            stabilizers_results['stabilizer' + str(index + 1)] = result
+            stabilizers_results["stabilizer" + str(index + 1)] = result
 
         for index, ups in enumerate(tensor.logical_z_list):
             temp_tensor_list = copy.deepcopy(tensor_list)
             result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-            logical_z_results['logical_z' + str(index + 1)] = result
+            logical_z_results["logical_z" + str(index + 1)] = result
 
         for index, ups in enumerate(tensor.logical_x_list):
             temp_tensor_list = copy.deepcopy(tensor_list)
             result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-            logical_x_results['logical_x' + str(index + 1)] = result
+            logical_x_results["logical_x" + str(index + 1)] = result
 
         # Save all results for the current tensor
         results[tensor_id] = {
-            'stabilizers': stabilizers_results,
-            'logical_z': logical_z_results,
-            'logical_x': logical_x_results
+            "stabilizers": stabilizers_results,
+            "logical_z": logical_z_results,
+            "logical_x": logical_x_results,
         }
 
     # Write to a CSV file
-    with open('output.csv', 'w', newline='') as csvfile:
+    with open("output.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
 
         # Write the results for each tensor
         for tensor_id, tensor_results in results.items():
             row = [str(tensor_id)]
             # Add stabilizers results
-            for key, value in tensor_results['stabilizers'].items():
+            for key, value in tensor_results["stabilizers"].items():
                 row.append(f"{key} = {value}")
             # Add logical Z results
-            for key, value in tensor_results['logical_z'].items():
+            for key, value in tensor_results["logical_z"].items():
                 row.append(f"{key} = {value}")
             # Add logical X results
-            for key, value in tensor_results['logical_x'].items():
+            for key, value in tensor_results["logical_x"].items():
                 row.append(f"{key} = {value}")
             writer.writerow(row)
 
     return results  # Return a dictionary containing the results
+
 
 # Example usage:
 # results = batch_push(tensor_list)
@@ -271,22 +277,22 @@ def process_tensor(tensor, tensor_list, logger_mode):
     for index, ups in enumerate(tensor.stabilizer_list):
         temp_tensor_list = copy.deepcopy(tensor_list)
         result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-        stabilizers_results['stabilizer' + str(index + 1)] = result
+        stabilizers_results["stabilizer" + str(index + 1)] = result
 
     for index, ups in enumerate(tensor.logical_z_list):
         temp_tensor_list = copy.deepcopy(tensor_list)
         result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-        logical_z_results['logical_z' + str(index + 1)] = result
+        logical_z_results["logical_z" + str(index + 1)] = result
 
     for index, ups in enumerate(tensor.logical_x_list):
         temp_tensor_list = copy.deepcopy(tensor_list)
         result = push_operator(temp_tensor_list, ups, tensor_id, logger_mode=logger_mode)
-        logical_x_results['logical_x' + str(index + 1)] = result
+        logical_x_results["logical_x" + str(index + 1)] = result
 
     results[tensor_id] = {
-        'stabilizers': stabilizers_results,
-        'logical_z': logical_z_results,
-        'logical_x': logical_x_results
+        "stabilizers": stabilizers_results,
+        "logical_z": logical_z_results,
+        "logical_x": logical_x_results,
     }
 
     return results
@@ -299,7 +305,9 @@ def batch_push_multiprocessing(tensor_list, logger_mode=False):
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
 
     # Launch the process_tensor function for each tensor in parallel
-    process_results = [pool.apply_async(process_tensor, args=(tensor, tensor_list, logger_mode)) for tensor in tensor_list]
+    process_results = [
+        pool.apply_async(process_tensor, args=(tensor, tensor_list, logger_mode)) for tensor in tensor_list
+    ]
 
     # Close the pool and wait for each task to complete
     pool.close()
@@ -310,19 +318,20 @@ def batch_push_multiprocessing(tensor_list, logger_mode=False):
         results.update(result.get())
 
     # Write to a CSV file
-    with open('output.csv', 'w', newline='') as csvfile:
+    with open("output.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         for tensor_id, tensor_results in results.items():
             row = [str(tensor_id)]
-            for key, value in tensor_results['stabilizers'].items():
+            for key, value in tensor_results["stabilizers"].items():
                 row.append(f"{key} = {value}")
-            for key, value in tensor_results['logical_z'].items():
+            for key, value in tensor_results["logical_z"].items():
                 row.append(f"{key} = {value}")
-            for key, value in tensor_results['logical_x'].items():
+            for key, value in tensor_results["logical_x"].items():
                 row.append(f"{key} = {value}")
             writer.writerow(row)
 
     return results  # Return a dictionary containing the results
+
 
 # Example usage:
 # results = batch_push(tensor_list)

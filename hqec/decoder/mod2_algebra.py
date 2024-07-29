@@ -1,5 +1,6 @@
-import numpy as np
 import itertools
+
+import numpy as np
 
 
 def mod2_matrix_multiply(a, b):
@@ -217,6 +218,7 @@ def solve_homogeneous_system_max_ones_with_anti_commutativity(A, filtered_sj, ma
     adjusted_x = adjust_x_to_anticommute_with_sj(A, x, filtered_sj, max_attempts_per_change)
     return adjusted_x if adjusted_x is not None else x
 
+
 # Example usage
 # A = ...  # Define the matrix A
 # filtered_sj = ...  # Define filtered sj
@@ -249,6 +251,7 @@ def find_kj_that_anticommutes_with_jth_row_only(A, j, zero_column_indices):
             return list(potential_kj)
 
     return None
+
 
 # Example usage
 # A = ...  # Define the matrix A
