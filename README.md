@@ -1,6 +1,5 @@
 # HQEC
 
-
 HQEC is designed to accelerate research efficiency in holographic quantum error-correcting codes. The software
 implements some operations on a holographic tile:
 
@@ -122,3 +121,33 @@ Using the zero-rate HaPPY code with R=0,1,2,3,4 as an example, the time consumed
 
 ### Integer-Optimization Decoder
 The performance overhead of the integer optimization decoder increases exponentially as the number of physical qubits increases. In other words, its performance overhead grows double-exponentially with the radius R. Therefore, when a tensor network decoder is available, the use of the integer optimization decoder is not recommended.
+
+This is the first "lite" version of HQEC operator push package. It contains an example of heptagon Steane Code.
+
+## Dependencies
+
+You'll need to have this software installed before carrying on:
+
+- `git`
+- `python` >= 3.9
+- `pipx`
+
+### Linux
+
+```shell
+apt-get update -qq -y
+apt-get upgrade -qq -y
+apt-get install git python3 pipx
+pipx ensurepath
+source ~/.bashrc
+```
+
+## Getting started
+
+```shell
+git clone https://github.com/QML-Group/HQEC
+cd HQEC
+poetry shell
+poetry install
+```
+

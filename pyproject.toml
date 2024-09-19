@@ -1,0 +1,83 @@
+[tool.poetry]
+name = "hqec"
+version = "0.0.1"
+description = "Holographic Quantum Error-Correction Codes tool"
+authors = [ "TU Delft" ]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/QML-Group/HQEC"
+repository = "https://github.com/QML-Group/HQEC"
+keywords = [ "holographic", "quantum", "error-correction", "codes" ]
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'License :: OSI Approved :: Apache Software License'
+]
+packages = [
+    { include = "hqec" },
+]
+
+[tool.poetry.dependencies]
+gurobipy = "11.0.3"
+hypertiling = "1.3.4"
+numpy = "^1.26"
+python = "^3.9"
+psutil = "6.0.0"
+tensornetwork = "0.4.6"
+
+[tool.poetry.group.dev.dependencies]
+black = ">=23.11,<25.0"
+coverage = {extras = ["toml"], version = "^7.3.2"}
+isort = "^5.11.4"
+pytest = {extras = ["toml"], version = ">=7.4.3,<9.0.0"}
+pytest-cov = ">=4.1,<6.0"
+mypy = "^1.7.0"
+pylint = "^3.1.0"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov --cov-report term-missing:skip-covered --cov-report xml"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+branch = true
+omit = [ "test/*", "**/.tox/**" ]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+line_length = 120
+
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+
+[tool.pylint]
+ignore = "parsing"
+max-line-length = 120
+disable = ["C0103", "C0114", "C0115", "C0116"]
+           # C0103: name formatting
+           # C0114: missing module docstring
+           # C0115: missing class docstring
+           # C0116: missing function docstring
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
