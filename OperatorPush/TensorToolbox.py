@@ -1116,3 +1116,11 @@ def has_logical(tensor):
 #     print("The tensor has at least one logical leg.")
 # else:
 #     print("The tensor has no logical legs.")
+
+def add_logical_legs_to_tensors(tensor_list, tensor_ids_list):
+    for tensor_id in tensor_ids_list:
+        tensor = get_tensor_from_id(tensor_list=tensor_list, given_tensor_id=tensor_id)
+        tensor.add_leg()  # Add a new leg
+        new_leg_index = len(tensor.legs) - 1
+        tensor.set_leg(new_leg_index, 'I', None)  # No connection, 'I' operator
+        tensor.legs[new_leg_index].logical = True  # Set the Logical property to True

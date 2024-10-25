@@ -1,5 +1,5 @@
 from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy, setup_max_rate_happy
 import numpy as np
 from QuDec.OutputProcessor import save_results_to_csv
 
@@ -10,16 +10,17 @@ if __name__ == '__main__':
     for task in task_list:
         rx, rz = task
         for R in [0, 1]:
-            tensor_list = setup_zero_rate_happy(R=R)
+            # tensor_list = setup_zero_rate_happy(R=R)
+            tensor_list = setup_max_rate_happy(R=R)
             p_depo_step = 0.01
             p_depo_start = 0.01
             p_depo_end = 0.55
             if R == 0 or R == 1 or R == 2 or R == 3:
                 N = 500
-                n_process = 20
+                n_process = 1
             else:
-                N = 200
-                n_process = 2
+                N = 500
+                n_process = 1
             ry = 1 - rx - rz
             print(rx, ry, rz)
             succ_rates = []

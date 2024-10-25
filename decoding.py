@@ -2,21 +2,21 @@ import numpy as np
 from QuDec import ErasureDecoder, PauliDecoder, TN_decoder
 
 class Decode:
-    def __init__(self, error_rate_start: float, error_rate_end: float, error_spacing: int, stabilizers: list,
-            x_logicals: list, z_logicals: list, tensor_list: list, time_limit: int, pauli_mixing_vector: tuple):
+    def __init__(self, error_rate_start: float, error_rate_end: float, number_spaces: int, stabilizers: list,
+            x_logicals: list, z_logicals: list, tensor_list: list, time_limit: float, pauli_mixing_vector: tuple):
         """
         Args:
             error_rate_start: float
             error_rate_end: float
-            error_spacing: int
+            number_spaces: int
             stabilizers: list
             x_logicals: list
             z_logicals: list
             tensor_list: list
-            time_limit: int
+            time_limit: float
             pauli_mixing_vector: tuple where (rx, ry, rz) are relative Pauli proportions
         """
-        self.error_rate_range = self.gen_error_rates(error_rate_start, error_rate_end, error_spacing)
+        self.error_rate_range = self.gen_error_rates(error_rate_start=error_rate_start, error_rate_end=error_rate_end, number_spaces=number_spaces)
         self.stabilizers = stabilizers
         self.x_logicals = x_logicals
         self.z_logicals = z_logicals
@@ -24,8 +24,8 @@ class Decode:
         self.time_limit = time_limit
         self.pauli_mixing_vector = pauli_mixing_vector
 
-    def gen_error_rates(self, error_rate_start, error_rate_end, error_spacing):
-        return np.linspace(error_rate_start, error_rate_end, error_spacing)
+    def gen_error_rates(self, error_rate_start, error_rate_end, number_spaces):
+        return np.linspace(error_rate_start, error_rate_end, number_spaces)
 
     def erasure(self, mc_trials: int):
         logicals = self.z_logicals + self.x_logicals
