@@ -12,8 +12,8 @@ The Operator push program is responsible for obtaining the stabilizer generators
 Some common holographic quantum error correction code tensor networks can be directly extracted from presets. For example, pushing the stabilizer generators and logical operators of the seed tensor of the zero rate HaPPY code to the boundary.
 
 ```python
-from hqec.operator_push.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
-from hqec.operator_push.push_toolbox import batch_push
+from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
+from hqec.OperatorPush.push_toolbox import batch_push
 
 # Set the radius of the HaPPY code
 R = 2
@@ -36,8 +36,8 @@ The erasure decoder can analyze the recoverability of logical information in a h
 
 ```python
 from hqec.decoder.decoder_erasure import calculate_recovery_rates_for_p_range
-from hqec.operator_push.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
-from hqec.operator_push.push_toolbox import batch_push_multiprocessing
+from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
+from hqec.OperatorPush.push_toolbox import batch_push_multiprocessing
 from hqec.input_processor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 from hqec.output_processor import save_results_to_csv
 
@@ -75,7 +75,7 @@ The tensor network decoder can analyze the recoverability of logical information
 
 ```python
 from hqec.decoder.decoder_tensor_network import tn_quantum_error_correction_decoder_multiprocess
-from hqec.operator_push.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
+from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
 import numpy as np
 from hqec.output_processor import save_results_to_csv
 
@@ -141,13 +141,3 @@ apt-get install git python3 pipx
 pipx ensurepath
 source ~/.bashrc
 ```
-
-## Getting started
-
-```shell
-git clone https://github.com/QML-Group/HQEC
-cd HQEC
-poetry shell
-poetry install
-```
-
