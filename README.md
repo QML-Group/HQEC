@@ -12,8 +12,8 @@ The Operator push program is responsible for obtaining the stabilizer generators
 Some common holographic quantum error correction code tensor networks can be directly extracted from presets. For example, pushing the stabilizer generators and logical operators of the seed tensor of the zero rate HaPPY code to the boundary.
 
 ```python
-from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
-from hqec.OperatorPush.push_toolbox import batch_push
+from OperatorPush.PushingToolbox import batch_push
+from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
 
 # Set the radius of the HaPPY code
 R = 2
@@ -35,11 +35,11 @@ The software provides 3 decoders for holographic quantum error correction codes:
 The erasure decoder can analyze the recoverability of logical information in a holographic quantum error correction code under a given quantum erasure error. An example of a Monte Carlo simulation based on the erasure decoder is as follows:
 
 ```python
-from hqec.decoder.decoder_erasure import calculate_recovery_rates_for_p_range
-from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
-from hqec.OperatorPush.push_toolbox import batch_push_multiprocessing
-from hqec.input_processor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
-from hqec.output_processor import save_results_to_csv
+from QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
+from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
+from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     # Examine the HaPPY code with radii R=0, 1, 2, and 3, respectively.
@@ -74,10 +74,10 @@ if __name__ == '__main__':
 The tensor network decoder can analyze the recoverability of logical information in a holographic quantum error correction code under a given Pauli quantum error. It has excellent decoding performance and is highly recommended. An example of a Monte Carlo simulation based on the tensor network decoder is as follows:
 
 ```python
-from hqec.decoder.decoder_tensor_network import tn_quantum_error_correction_decoder_multiprocess
-from hqec.OperatorPush.presets.zero_rate_happy_new_for_kj import setup_zero_rate_happy
+from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
+from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy, setup_max_rate_happy
 import numpy as np
-from hqec.output_processor import save_results_to_csv
+from QuDec.OutputProcessor import save_results_to_csv
 
 
 if __name__ == '__main__':
