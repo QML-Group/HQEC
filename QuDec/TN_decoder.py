@@ -1,18 +1,15 @@
 import numpy as np
-from OperatorPush.TensorToolbox import Tensor, read_out_boundary
 from OperatorPush.PushingToolbox import batch_push
 from OperatorPush.OperatorToolbox import traverse_ups_powers
 from QuDec.OperatorProcessor import pauli_to_binary_vector
 from QuDec.PauliDecoder import (generate_pauli_error_vector, calculate_syndrome, batch_convert_to_binary_vectors,
                                 create_f, binary_vector_to_pauli, apply_mod2_sum, is_error_equivalent)
 from QuDec.Mod2Algebra import mod2_matrix_multiply
-from QuDec.InputProcessor import get_formatted_ups_and_stabilizers, extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
-from OperatorPush.Presets.Heptagon_Steane_Code import setup_heptagon_zero_rate_steane
+from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 import tensornetwork as tn
 import psutil
 import os
-from multiprocessing import Process, Queue, Pool
+from multiprocessing import Pool
 
 def pauli_to_indices(pauli_string):
     """Convert a Pauli string to a list of indices where I=0, X=1, Y=2, Z=3."""
@@ -30,7 +27,6 @@ def generate_tensor_array(tensor):
     Returns:
     tuple: A numpy array representing the tensor and a list of dimension origins.
     """
-    import numpy as np
 
     # Determine the size of each dimension
     num_legs = len(tensor.legs)
@@ -40,8 +36,6 @@ def generate_tensor_array(tensor):
     tensor_array = np.zeros([dim_size] * num_legs)
 
     # Get all stabilizers including logical operators if they exist
-    # all_stabilizers = tensor.stabilizer_list + (tensor.logical_z_list if tensor.logical_z_list else []) + (
-    #     tensor.logical_x_list if tensor.logical_x_list else [])
     all_stabilizers = tensor.all_ups
 
     # Generate all possible stabilizers combinations (ups powers)
@@ -104,6 +98,7 @@ def convert_tensors_to_np_tensors(tensor_list):
     np_tensor_dict = {}
 
     for tensor in tensor_list:
+        # print(f"tensor.tensor_id: {tensor.tensor_id}, tensor.all_ups: {tensor.all_ups}")
         # Generate the NumPy tensor for each Tensor object using the generate_tensor_array function
         np_tensor = generate_tensor_array(tensor)
         np_tensor_dict[tensor.tensor_id] = np_tensor
@@ -207,12 +202,14 @@ def collect_edges_during_backtrack(tensor_list, starting_tensor_id=0, logger_mod
     visited_tensors = set()
 
     # Start from the starting_tensor_id to visit and collect edges
-    recursively_collect_edges(tensor_list, starting_tensor_id, None, visited_tensors, edges_during_backtrack, logger_mode=logger_mode)
+    recursively_collect_edges(tensor_list, starting_tensor_id, None, visited_tensors,
+                              edges_during_backtrack, logger_mode=logger_mode)
 
     # Return the collected edge information
     return edges_during_backtrack
 
-def recursively_collect_edges(tensor_list, current_tensor_id, previous_tensor_id, visited_tensors, edges_during_backtrack, logger_mode=False):
+def recursively_collect_edges(tensor_list, current_tensor_id, previous_tensor_id, visited_tensors,
+                              edges_during_backtrack, logger_mode=False):
     # Get the current tensor
     # print(f"Visiting: {current_tensor_id}")
     current_tensor = get_tensor_from_id(tensor_list, current_tensor_id)
@@ -230,7 +227,8 @@ def recursively_collect_edges(tensor_list, current_tensor_id, previous_tensor_id
         # Compare layers to determine the direction of traversal
         if neighbor_tensor.layer >= current_tensor.layer:
             # Only traverse to tensors of higher or same layer
-            recursively_collect_edges(tensor_list, neighbor_id, current_tensor_id, visited_tensors, edges_during_backtrack, logger_mode)
+            recursively_collect_edges(tensor_list, neighbor_id, current_tensor_id, visited_tensors,
+                                      edges_during_backtrack, logger_mode)
     # print(f"BACK, id {current_tensor_id}")
     # On backtracking, collect the edge information
     if previous_tensor_id is not None:
@@ -421,7 +419,7 @@ def tn_quantum_error_correction_decoder_multiprocess(tensor_list, p, rx, ry, rz,
     n = len(stabilizers[0])
 
     if f is None:
-        f = create_f(tensor_list=tensor_list)
+        f = create_f(symplectic_stabilizers=stabilizers_binary)
 
     args = [(tensor_list, p, rx, ry, rz, f, n, stabilizers, stabilizer_matrix, logical_z, logical_x, cpu_affinity_list)
             for _ in range(N)]

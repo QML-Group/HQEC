@@ -1,16 +1,9 @@
 from gurobipy import GRB, Model, or_, and_
 import random
-from QuDec.Mod2Algebra import mod2_matrix_multiply, mod2_right_inverse, mod2_gaussian_elimination
-from OperatorPush.PushingToolbox import batch_push, push_operator
-from OperatorPush.ExportToolbox import extract_tensor_info
-from OperatorPush.TensorToolbox import get_tensor_from_id
-from QuDec.InputProcessor import get_formatted_ups_and_stabilizers, extract_stabilizers_from_result_dict
-from QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, pauli_to_binary_vector,\
-    apply_mod2_sum
-from QuDec.Mod2Algebra import find_kj_that_anticommutes_with_jth_row_only, find_zero_columns_in_pairs,\
-    swap_and_mod2_multiply
+from QuDec.Mod2Algebra import mod2_matrix_multiply, mod2_gaussian_elimination
+from QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, apply_mod2_sum
+from QuDec.Mod2Algebra import swap_and_mod2_multiply, gf2_pinv
 import numpy as np
-import copy
 import os
 import psutil
 from multiprocessing import Process, Queue, Pool
@@ -373,7 +366,7 @@ def quantum_error_correction_decoder_multiprocess(tensor_list, stabilizers, logi
     stabilizers_and_logical = stabilizers_binary + logical_xs_binary + logical_zs_binary
     stabilizer_matrix = np.array(stabilizers_binary)
     if f is None:
-        f = create_f(tensor_list=tensor_list)
+        f = create_f(symplectic_stabilizers=stabilizers_binary)
     n = len(stabilizers[0])
     print(f"px, py, pz: {px, py, pz}")
     stabilizers_and_other_logs = stabilizers + logical_xs + logical_zs
@@ -409,7 +402,7 @@ def quantum_error_correction_decoder(tensor_list, stabilizers, logical_xs, logic
     stabilizer_matrix = np.array(stabilizers_binary)
 
     # Calculate the pseudo-inverse matrix F
-    f = create_f(tensor_list=tensor_list)
+    f = create_f(symplectic_stabilizers=stabilizers_binary)
 
     # Get the length of stabilizers (number of qubits)
     n = len(stabilizers[0])
@@ -520,52 +513,20 @@ def filter_pauli_operator_list(A, B):
 # print(filtered_B)  # ['XX', 'ZZ', 'YY']
 
 
-def create_f(tensor_list):
-    tensor_info_dict = extract_tensor_info(tensor_list)
-    f_list = []
-    for current_tensor in tensor_list:
-        current_tensor_id = current_tensor.tensor_id
-        formatted_ups_list, formatted_stabilizer_list = get_formatted_ups_and_stabilizers(tensor_info_dict,
-                                                                                          current_tensor_id)
-        binary_formatted_ups_list = batch_convert_to_binary_vectors(formatted_ups_list)
-        np_binary_formatted_ups_list = np.array(binary_formatted_ups_list)
-        binary_formatted_stabilizer_list = batch_convert_to_binary_vectors(formatted_stabilizer_list)
-        np_binary_formatted_stabilizer_list = np.array(binary_formatted_stabilizer_list)
-        if len(np_binary_formatted_stabilizer_list) == 0:
-            continue
-        current_zero_columns_in_stabilizers_index_list = find_zero_columns_in_pairs(
-            np_binary_formatted_stabilizer_list)
-        print(current_zero_columns_in_stabilizers_index_list)
-        for current_binary_formatted_stabilizer in binary_formatted_stabilizer_list:
-            current_binary_formatted_stabilizer_index_in_ups_list = binary_formatted_ups_list.index(
-                current_binary_formatted_stabilizer)
-            np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only\
-                (np_binary_formatted_ups_list, current_binary_formatted_stabilizer_index_in_ups_list,
-                 current_zero_columns_in_stabilizers_index_list)
-            if np_current_local_binary_kj is None:
-                current_layer = current_tensor.layer
-                current_zero_columns_in_stabilizers_index_list = []
-                for leg_id, leg in enumerate(current_tensor.legs):
-                    if leg.connection is not None:
-                        connected_tensor_id, connected_leg_ind = leg.connection
-                        connected_tensor_layer = get_tensor_from_id(tensor_list, connected_tensor_id).layer
-                        if connected_tensor_layer < current_layer:
-                            current_zero_columns_in_stabilizers_index_list.append(leg_id)
-                            current_zero_columns_in_stabilizers_index_list.append(leg_id + len(current_tensor.legs))
-                    if leg.logical:
-                        current_zero_columns_in_stabilizers_index_list.append(leg_id)
-                        current_zero_columns_in_stabilizers_index_list.append(leg_id + len(current_tensor.legs))
-                np_current_local_binary_kj = find_kj_that_anticommutes_with_jth_row_only \
-                    (np_binary_formatted_ups_list, current_binary_formatted_stabilizer_index_in_ups_list,
-                     current_zero_columns_in_stabilizers_index_list)
-                print(current_zero_columns_in_stabilizers_index_list)
+def create_f(symplectic_stabilizers):
+    if not isinstance(symplectic_stabilizers, list) or not symplectic_stabilizers:
+        raise ValueError("Input must be a non-empty list.")
 
-            current_local_binary_kj = list(np_current_local_binary_kj)
-            current_local_kj = binary_vector_to_pauli(current_local_binary_kj)
-            temp_tensor_list = copy.deepcopy(tensor_list)
-            boundary_kj = push_operator(temp_tensor_list, current_local_kj, current_tensor_id, logger_mode=False)
-            binary_boundary_kj = pauli_to_binary_vector(boundary_kj)
-            f_list.append(binary_boundary_kj)
+    for row in symplectic_stabilizers:
+        if not isinstance(row, list):
+            raise ValueError("Each row must be a list.")
 
-    f = np.array(f_list).T
+    n = int(len(symplectic_stabilizers[0])/2)
+
+    identity_matrix = np.eye(n, dtype=int)
+    zeros_block = np.zeros((n, n), dtype=int)
+    lambda_matrix = np.block([[zeros_block, identity_matrix], [identity_matrix, zeros_block]])
+    s_lambda_matrix = lambda_matrix @ np.array(symplectic_stabilizers).T
+    f = gf2_pinv(s_lambda_matrix).T.tolist()
+
     return f
