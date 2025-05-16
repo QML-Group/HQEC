@@ -72,29 +72,6 @@ def apply_mod2_sum(e, stabilizers_and_logical, lambda_values):
 # print("Result:", result)
 
 
-def apply_mod2_sum_legacy(e, stabilizers_and_logical, lambda_values):
-    # Initialize the result vector, initially the same as L
-    result = e.copy()
-
-    # Iterate through each stabilizer and its corresponding lambda value
-    for lambda_val, stabilizer in zip(lambda_values, stabilizers_and_logical):
-        if lambda_val:  # If lambda value is 1, apply modulo 2 addition
-            result = [r ^ s for r, s in zip(result, stabilizer)]
-
-    return result
-
-# Example usage
-# L = [1, 1, 0, 0, 1]
-# stabilizers = [
-#     [1, 0, 1, 0, 1],
-#     [0, 1, 0, 1, 0],
-#     [1, 1, 1, 1, 1]
-# ]
-# lambda_values = [1, 0, 1]  # Assume these are the lambda values you computed earlier
-# result = apply_mod2_sum(L, stabilizers, lambda_values)
-# print("Result:", result)
-
-
 def binary_vector_to_pauli(binary_vector):
     """
     Convert a binary vector back to a Pauli operator string.
@@ -124,27 +101,3 @@ def binary_vector_to_pauli(binary_vector):
 # binary_vector = [0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0]
 # pauli_string = binary_vector_to_pauli(binary_vector)
 # print(pauli_string)
-
-
-def unfilter_pauli_operator_list(A, B):
-    """
-    Generate a Pauli operator string by merging a filtered Pauli string with a reference string.
-
-    Args:
-    A (str): A Pauli operator string used as a reference.
-    B (str): A filtered Pauli operator string.
-
-    Returns:
-    str: The unfiltered Pauli operator string.
-    """
-    C = []
-    B_idx = 0
-
-    for a_char in A:
-        if a_char == 'I':
-            C.append('I')
-        else:
-            C.append(B[B_idx])
-            B_idx += 1
-
-    return ''.join(C)
