@@ -1,4 +1,4 @@
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
 from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 from DIstanceFind.OperatorProcessor import pauli_to_binary_vector, batch_convert_to_binary_vectors, apply_mod2_sum, \

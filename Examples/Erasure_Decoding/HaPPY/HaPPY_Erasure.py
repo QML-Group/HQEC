@@ -1,5 +1,5 @@
 from QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
 from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 from QuDec.OutputProcessor import save_results_to_csv

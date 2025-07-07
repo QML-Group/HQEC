@@ -1,5 +1,5 @@
 from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 import numpy as np
 from QuDec.OutputProcessor import save_results_to_csv
 

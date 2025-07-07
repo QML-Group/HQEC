@@ -13,7 +13,7 @@ Some common holographic quantum error correction code tensor networks can be dir
 
 ```python
 from OperatorPush.PushingToolbox import batch_push
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 
 # Set the radius of the HaPPY code
 R = 2
@@ -36,7 +36,7 @@ The erasure decoder can analyze the recoverability of logical information in a h
 
 ```python
 from QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
 from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 from QuDec.OutputProcessor import save_results_to_csv
@@ -46,26 +46,26 @@ if __name__ == '__main__':
     for R in [0, 1, 2, 3]:
         # Obtain the tensor network of the Zero rate HaPPY code with the corresponding radius through the preset.
         tensor_list = setup_zero_rate_happy(R=R)
-        
+
         # Obtain the operators of the corresponding HaPPY code using the operator push function.
         results_dict = batch_push_multiprocessing(tensor_list)
-        
+
         # Extract the stabilizer generators from the result dict using the built-in function and store them in a list.
         stabilizers = extract_stabilizers_from_result_dict(results_dict)
-        
+
         # Extract the logical operators Z and X from the result dictionary separately and store them each in a list.
         logical_zs, logical_xs = extract_logicals_from_result_dict(results_dict)
-        
+
         # Here, we do not distinguish between logical Z and X. 
         # Instead, we combine them into a single list that stores the logical operators.
         logical_operators = [logical_zs[0]] + [logical_xs[0]]
-        
+
         # Starting from an erasure error rate p of 0.01 to 1.0 with a step size of 0.01, 
         # calculate the recoverability rate for each erasure error rate p. 
         # The number of Monte Carlo trials for each p is n = 1,000.
         results = calculate_recovery_rates_for_p_range(n=1000, p_start=0.01, p_end=1.0, p_step=0.01,
                                                        stabilizers=stabilizers, logical_operators=logical_operators)
-        
+
         # Store the recoverability rate curve data for this radius R zero rate HaPPY code into a CSV file.
         save_results_to_csv(results, file_path=F'R{R}_rec.csv')
 ```
@@ -75,13 +75,12 @@ The tensor network decoder can analyze the recoverability of logical information
 
 ```python
 from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy, setup_max_rate_happy
+from OperatorPush.Presets.HaPPY import setup_zero_rate_happy, setup_max_rate_happy
 import numpy as np
 from QuDec.OutputProcessor import save_results_to_csv
 
-
 if __name__ == '__main__':
-    task_list = [(1/3, 1/3)]
+    task_list = [(1 / 3, 1 / 3)]
     for task in task_list:
         rx, rz = task
         for R in [0, 1, 2]:

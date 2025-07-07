@@ -464,6 +464,14 @@ def create_topology_by_segments(grg):
     return tensor_list
 
 
+def add_logical_legs(tensor_list, start_idx, end_idx):
+    for tensor in tensor_list[start_idx:end_idx]:
+        tensor.add_leg()  # Add a new leg
+        new_leg_index = len(tensor.legs) - 1
+        tensor.set_leg(new_leg_index, 'I', None)  # No connection, 'I' operator
+        tensor.legs[new_leg_index].logical = True  # Set the Logical property to True
+
+
 def read_out_boundary(tensor_list, starting_tensor_id=0, logger_mode=False):
     # Create a list to store leg information
     boundary_operators = []
