@@ -1,9 +1,5 @@
-from OperatorPush.OperatorToolbox import (pauli_product, traverse_ups_powers, pauli_flip, minimize_operator_weight,
-                                          apply_mod2_sum)
+from OperatorPush.OperatorToolbox import pauli_product, traverse_ups_powers, pauli_flip
 import logging
-from QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, pauli_to_binary_vector
-import numpy as np
-from DIstanceFind.DistanceFInder import calculate_pauli_weight
 
 # Config logging
 logging.basicConfig(filename='OperatorPush.log', level=logging.INFO,
@@ -44,19 +40,9 @@ class Tensor:
         self.all_ups = []
         self.incomplete_logical = False
 
-    def add_stabilizer(self, ups):
-        """Add a stabilizer UPS to the tensor."""
-        self.stabilizer_list.append(ups)
-
     def set_leg(self, leg_index, operator, connection):
         if 0 <= leg_index < len(self.legs):
             self.legs[leg_index] = TensorLeg(operator, connection)
-        else:
-            logger.error("Invalid leg index")
-
-    def set_leg_operator(self, leg_index, operator):
-        if 0 <= leg_index < len(self.legs):
-            self.legs[leg_index].operator_set(operator)
         else:
             logger.error("Invalid leg index")
 
@@ -67,14 +53,6 @@ class Tensor:
         else:
             new_leg = leg
             self.legs.append(new_leg)
-
-    def apply_ups(self, ups):
-        if len(ups) != len(self.legs):
-            logger.error("ups length doesn't match the number of legs.")
-            return
-
-        for i, operator in enumerate(ups):
-            self.set_leg(i, pauli_product([operator, self.legs[i].operator]), self.legs[i].connection)
 
     def pauli_push(self, leg_index, tensor_list, logger_mode=False):
         if 0 <= leg_index < len(self.legs):
@@ -262,11 +240,6 @@ class Tensor:
                 if leg.connection is not None:
                     if not leg.blocked:
                         return False  # Non-'I' legs that are not blocked do not meet the condition.
-                    # target_tensor_index, target_leg_index = leg.connection
-                    # target_tensor = tensor_list[target_tensor_index]
-                    # target_leg = target_tensor.legs[target_leg_index]
-                    # if target_leg.operator != 'I':
-                    # return False  # The operator on the target leg is not 'I', so it does not meet the condition.
                 non_i = True
         if non_i:
             return True
@@ -282,8 +255,6 @@ class Tensor:
         for leg_index in non_i_legs:
             leg = self.legs[leg_index]
             if leg.connection is not None and not leg.blocked:
-                # print("%^%*&%&%*%&^$&$&^$&$^*$^&%^)&^$&^$&^(*)(")
-                # print(self)
                 self.pauli_push(leg_index, tensor_list, logger_mode=logger_mode)
 
         if self.starting_tensor:
@@ -295,13 +266,8 @@ class Tensor:
                             self.pauli_push(leg_index, tensor_list, logger_mode=logger_mode)
             for leg_index in range(len(self.legs)):
                 self.block_leg(leg_index, tensor_list)
-            # # Block legs
-            # for leg_index in range(len(self.legs)):
-            #     self.block_leg(leg_index, tensor_list)
+            # Block legs
             if same_layer_neighbor_tensor:
-                # print("Starting*******************************************************************:", self.tensor_id)
-                # print(same_layer_neighbor_tensor)
-                # print(self)
                 return same_layer_neighbor_tensor
             return
         # Step 3: Re-check for non-I operators and ups condition
@@ -391,217 +357,8 @@ class Tensor:
         # Step 6: block all connected legs
         for leg_index in range(len(self.legs)):
             self.block_leg(leg_index, tensor_list)
+        return None
 
-    def operator_push_decision_min_wt(self, tensor_list, tensors_for_current_round, logger_mode=False):
-        if logger_mode:
-            logger.info(f'\nWorking on tensor: {self.tensor_id}')
-
-        # check the input legs for non-I ops
-        non_i_input_legs = [i for i in self.find_legs_connecting_to_upper_layer(tensor_list) if self.legs[i].operator
-                            != 'I']
-
-        # if input is non_I
-        if non_i_input_legs:
-            legs_for_ups_push = [i for i, leg in enumerate(self.legs) if leg.blocked]
-
-            # Initialize an empty list to store operators
-            operators_on_legs_for_ups_push = []
-
-            # Iterate over the leg IDs in legs_for_ups_push
-            for leg_id in legs_for_ups_push:
-                leg = self.legs[leg_id]
-                operator = leg.operator
-                operators_on_legs_for_ups_push.append(operator)
-            if logger_mode:
-                logger.info(f"Collected legs for ups push for tensor {self.tensor_id}: {legs_for_ups_push},"
-                            f" corresponding operator:, {operators_on_legs_for_ups_push}")
-
-            # Step 4: Call the ups_decision function and apply the selected ups
-            selected_ups = self.ups_decision(legs_for_ups_push, logger_mode=logger_mode)
-
-            # If selected_ups is found, then apply it.
-            self.apply_operators_to_legs(selected_ups, logger_mode=logger_mode)
-
-        # minimize the total output weight
-        current_operator = self.get_tensor_operator_string()
-        current_tensor_stabilizer_list = self.stabilizer_list
-        current_tensor_logical_list = self.logical_x_list + self.logical_z_list
-        current_tensor_stabilizer_str_list = []
-        current_tensor_logical_str_list = []
-        if current_tensor_stabilizer_list:
-            if type(current_tensor_stabilizer_list[0]):
-                for current_tensor_stabilizer in current_tensor_stabilizer_list:
-                    current_tensor_stabilizer_str = ''.join(current_tensor_stabilizer)
-                    current_tensor_stabilizer_str_list.append(current_tensor_stabilizer_str)
-            else:
-                current_tensor_stabilizer_str_list = current_tensor_stabilizer_list[:]
-        if current_tensor_logical_list:
-            if type(current_tensor_logical_list[0]):
-                for current_tensor_logical in current_tensor_logical_list:
-                    current_tensor_logical_str = ''.join(current_tensor_logical)
-                    current_tensor_logical_str_list.append(current_tensor_logical_str)
-            else:
-                current_tensor_logical_str_list = current_tensor_logical_list[:]
-        modified_stab_log_operators = self.remove_logical_operators(current_tensor_stabilizer_str_list +
-                                                                    current_tensor_logical_str_list)
-        modified_stabilizers_binary = batch_convert_to_binary_vectors(modified_stab_log_operators)
-        stabilizers_binary = batch_convert_to_binary_vectors(current_tensor_stabilizer_str_list +
-                                                             current_tensor_logical_str_list)
-        modified_current_operator = self.remove_logical_operators([''.join(current_operator)])
-        # print("modified_current_operator", modified_current_operator)
-        # print("modified_stab_log_operators", modified_stab_log_operators)
-        # print(f"bi_modified_stab_log_operators: {modified_stabilizers_binary}")
-        current_operator_binary = pauli_to_binary_vector(current_operator)
-        modified_current_operator_binary = pauli_to_binary_vector([char for char in modified_current_operator[0]])
-        # print(f"modified_current_operator_binary:{modified_current_operator_binary}")
-        # print(f"current tensor: {self}")
-        punish_index_list = self.generate_punish_index_list(tensor_list)
-        lamda = minimize_operator_weight(op=modified_current_operator_binary, stabilizers=modified_stabilizers_binary,
-                                         punish_index_list=punish_index_list, punishment=10000,
-                                         time_limit=None, mip_focus=3, heuristics=0, output_flag=False)
-
-        lambda_values_int = np.round(lamda).astype(int)
-
-        # print(f"lambda_values_int:{lambda_values_int}")
-
-        # Apply the lambda values to get the minimal weight error
-        op_bar = apply_mod2_sum(current_operator_binary, stabilizers_binary, lambda_values_int)
-        op_bar_str = binary_vector_to_pauli(op_bar)
-        current_operator_str = binary_vector_to_pauli(current_operator_binary)
-        print('****************************************')
-        print(f"current_operator_binary: {current_operator_str}")
-        print(f"wt : {calculate_pauli_weight(current_operator_str)}")
-
-        print(f"op_bar_str: {op_bar_str}")
-        print(f"wt : {calculate_pauli_weight(op_bar_str)}")
-
-        # set ops
-        self.set_tensor_operators(op_bar_str)
-
-        # Step 5: new round of pauli push
-        non_i_legs = [i for i, leg in enumerate(self.legs) if leg.operator != 'I']
-        if not non_i_legs:
-            if logger_mode:
-                logger.info(f'No non-I leg for tensor {self.tensor_id} after ups push')
-        else:
-            for leg_index in non_i_legs:
-                leg = self.legs[leg_index]
-                if leg.connection is not None and not leg.blocked:
-                    self.pauli_push(leg_index, tensor_list, logger_mode=logger_mode)
-
-        # Step 6: block all connected legs
-        for leg_index in range(len(self.legs)):
-            self.block_leg(leg_index, tensor_list)
-
-    def generate_punish_index_list(self, tensor_list):
-        """
-        Generate a list of leg indices that should be punished based on the connectivity and state of target tensors.
-
-        Args:
-        tensor_list (list): List of all tensors in the network.
-
-        Returns:
-        list: Indices of legs that should be punished.
-        """
-        punish_index_list = []
-
-        for leg_index, leg in enumerate(self.legs):
-            if leg.connection:
-                target_tensor_id, _ = leg.connection
-                target_tensor = get_tensor_from_id(tensor_list, target_tensor_id)
-                # print(f"target tensor: {target_tensor}")
-
-                # Check if the target tensor's layer is lower and all its legs have 'I' operators
-                if target_tensor.layer > self.layer and all(
-                        target_leg.operator == 'I' for target_leg in target_tensor.legs):
-                    punish_index_list.append(leg_index)
-
-        return punish_index_list
-
-    # Example usage
-    # Assuming tensor_list is a list of Tensor objects and tensor is a specific Tensor object within tensor_list
-    # tensor = Tensor(...)
-    # punish_index_list = tensor.generate_punish_index_list(tensor_list)
-    # print(punish_index_list)
-
-    def remove_logical_operators(self, operators):
-        """
-        Remove the single-qubit operators at the positions where this tensor's legs are marked as logical.
-
-        Args:
-        operators (list of str): List of multi-qubit Pauli operators.
-
-        Returns:
-        list of str: Modified list of operators with logical qubit operators removed.
-        """
-        # Find the indices of legs that are logical
-        logical_indices = [i for i, leg in enumerate(self.legs) if leg.logical]
-
-        # Remove the operators at these indices from each operator string
-        modified_operators = []
-        for op in operators:
-            modified_op = ''.join(op[i] for i in range(len(op)) if i not in logical_indices)
-            modified_operators.append(modified_op)
-
-        return modified_operators
-
-    def set_tensor_operators(self, operators):
-        """
-        Set the operators for each leg of the tensor based on the provided string or list.
-
-        Args:
-        operators (str or list): A string or a list of single-character operators, such as 'XIIXZ' or ['X', 'I', 'I', 'X', 'Z'].
-        """
-        if isinstance(operators, str):
-            operators = list(operators)
-
-        if len(operators) != len(self.legs):
-            raise ValueError("Number of operators must match the number of legs in the tensor.")
-
-        for idx, operator in enumerate(operators):
-            if operator not in ['I', 'X', 'Y', 'Z']:
-                raise ValueError(
-                    f"Invalid operator '{operator}' at position {idx}. Allowed operators are 'I', 'X', 'Y', 'Z'.")
-            self.legs[idx].operator = operator
-
-    # Example usage
-    # tensor = Tensor(...)
-    # tensor.set_tensor_operators('XIIXZ')
-    # or
-    # tensor.set_tensor_operators(['X', 'I', 'I', 'X', 'Z'])
-
-    def get_tensor_operator_string(self):
-        """
-        Get the operator string representing the current state of the tensor.
-
-        Returns:
-        str: A string concatenating the operators of each leg.
-        """
-        operator_string = ""
-        for leg in self.legs:
-            operator_string += leg.operator  # Assuming each leg has an 'operator' attribute
-        return operator_string
-
-    def find_legs_connecting_to_upper_layer(self, tensor_list):
-        """
-        Find legs whose connection targets a tensor with a lower layer.
-
-        Args:
-        tensor_list (list): The list of all tensors in the network.
-
-        Returns:
-        list: Indices of legs connecting to tensors with a lower layer.
-        """
-        upper_layer_leg_indices = []
-
-        for idx, leg in enumerate(self.legs):
-            if leg.connection:
-                target_tensor_id, _ = leg.connection
-                target_tensor = get_tensor_from_id(tensor_list=tensor_list, given_tensor_id=target_tensor_id)
-                if target_tensor and target_tensor.layer < self.layer:
-                    upper_layer_leg_indices.append(idx)
-
-        return upper_layer_leg_indices
 
     def find_same_layer_neighbor(self, tensors_for_current_round):
         neighbors_id_set = set(self.get_connections())
@@ -648,34 +405,6 @@ class Tensor:
         return non_logical_leg_num
 
 
-def topology_set(connections, tensor_list, logger_mode=False):
-    for connection in connections:
-        if len(connection) != 4:
-            if logger_mode:
-                logger.error("Invalid connection format. Skipping...")
-            continue
-
-        tensor1_id, tensor1_leg_index, tensor2_id, tensor2_leg_index = connection
-
-        # Find the corresponding tensors
-        tensor1 = None
-        tensor2 = None
-
-        for tensor in tensor_list:
-            if tensor.tensor_id == tensor1_id:
-                tensor1 = tensor
-            elif tensor.tensor_id == tensor2_id:
-                tensor2 = tensor
-
-        if tensor1 is not None and tensor2 is not None:
-            # Set connections between the legs
-            tensor1.set_leg(tensor1_leg_index, 'I', (tensor2_id, tensor2_leg_index))
-            tensor2.set_leg(tensor2_leg_index, 'I', (tensor1_id, tensor1_leg_index))
-        else:
-            if logger_mode:
-                logger.error("Invalid tensor IDs in the connection. Skipping...")
-
-
 def create_cell_centered_topology(grg, selected_ids, tensor_list):
     n_tensor = len(grg)
 
@@ -719,32 +448,6 @@ def are_tensors_connected(tensor1, tensor2):
     return False
 
 
-def ensure_minimum_legs(tensor_list, target_leg_number, start_idx, end_idx):
-    for tensor in tensor_list[start_idx:end_idx]:
-        while len(tensor.legs) < target_leg_number:
-            tensor.add_leg()
-
-
-def assign_ups_to_tensors(ups_generators, tensor, logger_mode=False):
-    # Check if ups_generators matches the number of legs in the tensor
-    for ups_Generator in ups_generators:
-        if len(ups_Generator) != len(tensor.legs):
-            if logger_mode:
-                logger.error(f"ups_Generator length does not match "
-                             f"the number of legs in Tensor {tensor.tensor_id}. Skipping.")
-            continue
-        # Save ups_Generator to the tensor's ups_List
-        tensor.ups_list.append(ups_Generator)
-
-
-def add_logical_legs(tensor_list, start_idx, end_idx):
-    for tensor in tensor_list[start_idx:end_idx]:
-        tensor.add_leg()  # Add a new leg
-        new_leg_index = len(tensor.legs) - 1
-        tensor.set_leg(new_leg_index, 'I', None)  # No connection, 'I' operator
-        tensor.legs[new_leg_index].logical = True  # Set the Logical property to True
-
-
 def create_topology_by_segments(grg):
     tensor_list = []
     n_tensor = len(grg)
@@ -761,27 +464,6 @@ def create_topology_by_segments(grg):
     return tensor_list
 
 
-def read_out_boundary_legacy(tensor_list):
-    # Create a list to store leg information
-    leg_info = []
-
-    # Traverse each tensor in the tensor_list
-    for tensor_id, tensor in enumerate(tensor_list):
-        for leg_id, leg in enumerate(tensor.legs):
-            # Check if the leg meets the conditions (not blocked and not logical)
-            if not leg.blocked and not leg.logical:
-                # Save the operator and leg information
-                leg_info.append((tensor_id, leg_id, leg.operator))
-
-    # Sort the leg information by tensor id and leg id
-    sorted_leg_info = sorted(leg_info, key=lambda x: (x[0], x[1]))
-
-    # Create the final output string
-    output_string = ''.join(operator for _, _, operator in sorted_leg_info)
-
-    return output_string
-
-
 def read_out_boundary(tensor_list, starting_tensor_id=0, logger_mode=False):
     # Create a list to store leg information
     boundary_operators = []
@@ -795,6 +477,20 @@ def read_out_boundary(tensor_list, starting_tensor_id=0, logger_mode=False):
     # Return the read out result
     boundary_operators_string = ''.join(boundary_operators)
     return boundary_operators_string
+
+
+def ensure_minimum_legs(tensor_list, target_leg_number, start_idx, end_idx):
+    for tensor in tensor_list[start_idx:end_idx]:
+        while len(tensor.legs) < target_leg_number:
+            tensor.add_leg()
+
+
+def add_logical_legs(tensor_list, start_idx, end_idx):
+    for tensor in tensor_list[start_idx:end_idx]:
+        tensor.add_leg()  # Add a new leg
+        new_leg_index = len(tensor.legs) - 1
+        tensor.set_leg(new_leg_index, 'I', None)  # No connection, 'I' operator
+        tensor.legs[new_leg_index].logical = True  # Set the Logical property to True
 
 
 def recursively_visit_near_boundary_tensor(tensor_list, given_tensor_id, have_been_read_tensors, boundary_operators,
@@ -928,9 +624,6 @@ def traverse_h_gate(tensor_list):
 
 def unblock_children_legs(tensor_list, tensor_id, logger_mode=False):
     # Iterate through tensors in tensor_list that are related to the given tensor_id
-    # print(f"UUUUUUUUUUUUUUUUBBBBBBBBBBBBBBB\n{tensor_id}")
-    # print(get_tensor_from_id(tensor_list, tensor_id))
-    # print(get_tensor_from_id(tensor_list, 34))
     if logger_mode:
         logger.info(f"\nUnblocking tensor {tensor_id}")
     current_tensor = get_tensor_from_id(tensor_list, tensor_id)
@@ -939,63 +632,13 @@ def unblock_children_legs(tensor_list, tensor_id, logger_mode=False):
         if leg.blocked and leg.connection is not None:
             # Get information about the connected target tensor
             target_tensor_id, target_leg_index = leg.connection
-            # print(target_tensor_id, target_leg_index)
             target_tensor = get_tensor_from_id(tensor_list, target_tensor_id)
-            # print(target_tensor)
             if target_tensor.layer > current_tensor.layer:
                 # If the connected target tensor is not in the specified list, unblock it
                 leg.blocked = False
                 # Also, unblock the leg on the connected target tensor
                 target_leg = target_tensor.legs[target_leg_index]
                 target_leg.blocked = False
-            # print(target_tensor)
-    # print("AAAAAAAAAAAAAAAAFFFFFFFFFFFFFFFFF\n ")
-    # print(get_tensor_from_id(tensor_list, tensor_id))
-    # print(get_tensor_from_id(tensor_list, 34))
-
-
-def remove_single_tensor(tensor_list, tensor_id):
-    # Find the index of the tensor with the given ID in the tensor list
-    tensor_index = None
-    for i, tensor in enumerate(tensor_list):
-        if tensor.tensor_id == tensor_id:
-            tensor_index = i
-            break
-
-    if tensor_index is not None:
-        # Remove the tensor from the list
-        tensor_list.pop(tensor_index)
-
-        # Update the connections in other tensors
-        for tensor in tensor_list:
-            new_legs = []
-            for leg in tensor.legs:
-                if leg.connection is not None and leg.connection[0] == tensor_id:
-                    # Remove the connection to the removed tensor
-                    leg.connection = None
-                else:
-                    new_legs.append(leg)
-            tensor.legs = new_legs[:]
-
-            # Update connection info with neighbors
-            for leg_id, leg_object in enumerate(tensor.legs):
-                connected_neighbor_tensor_id = leg_object.connection[0]
-                connected_neighbor_tensor_leg_id = leg_object.connection[1]
-                for target in tensor_list:
-                    if target.tensor_id == connected_neighbor_tensor_id:
-                        target_tensor_leg = target.legs[connected_neighbor_tensor_leg_id]
-                        target_tensor_leg.connection = (tensor.tensor_id, leg_id)
-
-    else:
-        print(f"Tensor with ID {tensor_id} not found in the tensor list.")
-
-
-def remove_tensor(tensor_list, tensor_ids):
-    if type(tensor_ids) is list:
-        for tensor_id in tensor_ids:
-            remove_single_tensor(tensor_list, tensor_id)
-    elif type(tensor_ids) is int:
-        remove_single_tensor(tensor_list, tensor_ids)
 
 
 def get_tensor_from_id(tensor_list, given_tensor_id):
@@ -1011,14 +654,6 @@ def write_layer(tensor_list, tensor_id_list, layer_num):
     for tensor_id in tensor_id_list:
         current_tensor = get_tensor_from_id(tensor_list, tensor_id)
         current_tensor.layer = layer_num
-
-
-def create_tensor_list(n):
-    tensor_list = []
-    for tensor_id in range(n):
-        tensor = Tensor(tensor_id, 0)
-        tensor_list.append(tensor)
-    return tensor_list
 
 
 def connect_tensors(tensor_list, tensor_id1, tensor_id2):
@@ -1046,22 +681,6 @@ def connect_tensors(tensor_list, tensor_id1, tensor_id2):
 
     tensor1.add_leg(leg1)
     tensor2.add_leg(leg2)
-
-
-def is_ups_logical(ups, tensor):
-    logical_exists = False
-    logical_leg_ids = []
-    for leg_id, leg in enumerate(tensor.legs):
-        if leg.logical:
-            logical_exists = True
-            logical_leg_ids.append(leg_id)
-    if not logical_exists:
-        return False
-    else:
-        for logical_leg_id in logical_leg_ids:
-            if ups[logical_leg_id] != "I":
-                return True
-        return False
 
 
 def swap_tensor_legs(tensor, leg_index_1, leg_index_2, tensor_list):
@@ -1094,33 +713,3 @@ def swap_tensor_legs(tensor, leg_index_1, leg_index_2, tensor_list):
 
 # Example usage:
 # swap_tensor_legs(tensor_to_modify, 0, 1, tensor_list)
-
-
-def has_logical(tensor):
-    """
-    Check if any leg of the given tensor has the attribute 'logical' set to True.
-
-    Args:
-    tensor (Tensor): The tensor to check.
-
-    Returns:
-    bool: True if any leg of the tensor has 'logical' set to True, False otherwise.
-    """
-    for leg in tensor.legs:
-        if leg.logical:  # If the 'logical' attribute of the leg is True
-            return True
-    return False
-
-# Example usage:
-# if has_logical(some_tensor):
-#     print("The tensor has at least one logical leg.")
-# else:
-#     print("The tensor has no logical legs.")
-
-def add_logical_legs_to_tensors(tensor_list, tensor_ids_list):
-    for tensor_id in tensor_ids_list:
-        tensor = get_tensor_from_id(tensor_list=tensor_list, given_tensor_id=tensor_id)
-        tensor.add_leg()  # Add a new leg
-        new_leg_index = len(tensor.legs) - 1
-        tensor.set_leg(new_leg_index, 'I', None)  # No connection, 'I' operator
-        tensor.legs[new_leg_index].logical = True  # Set the Logical property to True

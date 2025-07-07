@@ -2,7 +2,6 @@ import random
 import numpy as np
 from QuDec.OperatorProcessor import batch_convert_to_binary_vectors
 from QuDec.Mod2Algebra import mod2_gaussian_elimination
-import multiprocessing
 from multiprocessing import Pool, current_process
 import psutil
 
