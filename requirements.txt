@@ -1,0 +1,6 @@
+numpy
+gurobipy
+tensornetwork
+hypertiling
+psutil
+galois
