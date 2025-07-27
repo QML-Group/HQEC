@@ -1,8 +1,8 @@
-from QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
-from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
-from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
-from QuDec.OutputProcessor import save_results_to_csv
+from LEGO_HQEC.QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
+from LEGO_HQEC.OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
+from LEGO_HQEC.QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from LEGO_HQEC.QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     for R in [0, 1]:

@@ -1,7 +1,7 @@
-from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
+from LEGO_HQEC.QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
 import numpy as np
-from QuDec.OutputProcessor import save_results_to_csv
+from LEGO_HQEC.QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     task_list = [(1/3, 1/3)]

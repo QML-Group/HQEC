@@ -1,9 +1,9 @@
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
-from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
-from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
-from DIstanceFind.OperatorProcessor import pauli_to_binary_vector, batch_convert_to_binary_vectors, apply_mod2_sum, \
-    binary_vector_to_pauli
-from DIstanceFind.DistanceFInder import minimize_logical_operator_weight, calculate_pauli_weight
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
+from LEGO_HQEC.OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
+from LEGO_HQEC.QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from LEGO_HQEC.DIstanceFind.OperatorProcessor import (pauli_to_binary_vector, batch_convert_to_binary_vectors,
+                                                      apply_mod2_sum, binary_vector_to_pauli)
+from LEGO_HQEC.DIstanceFind.DistanceFInder import minimize_logical_operator_weight, calculate_pauli_weight
 
 if __name__ == '__main__':
     # Initialize parameters
