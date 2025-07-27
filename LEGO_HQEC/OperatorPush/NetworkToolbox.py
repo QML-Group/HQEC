@@ -1,4 +1,4 @@
-from OperatorPush.TensorToolbox import get_tensor_from_id, connect_tensors, swap_tensor_legs
+from LEGO_HQEC.OperatorPush.TensorToolbox import get_tensor_from_id, connect_tensors, swap_tensor_legs
 from collections import deque
 
 

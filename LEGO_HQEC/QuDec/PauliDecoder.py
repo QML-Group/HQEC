@@ -1,8 +1,8 @@
 from gurobipy import GRB, Model, or_, and_
 import random
-from QuDec.Mod2Algebra import mod2_matrix_multiply, mod2_gaussian_elimination
-from QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, apply_mod2_sum
-from QuDec.Mod2Algebra import swap_and_mod2_multiply, gf2_pinv
+from LEGO_HQEC.QuDec.Mod2Algebra import mod2_matrix_multiply, mod2_gaussian_elimination
+from LEGO_HQEC.QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, apply_mod2_sum
+from LEGO_HQEC.QuDec.Mod2Algebra import swap_and_mod2_multiply, gf2_pinv
 import numpy as np
 import os
 import psutil

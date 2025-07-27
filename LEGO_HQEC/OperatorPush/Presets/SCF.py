@@ -1,8 +1,9 @@
-from OperatorPush.NetworkToolbox import create_layer_q4, assign_layers_to_tensors
-from OperatorPush.TensorToolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor, has_logical
+from LEGO_HQEC.OperatorPush.NetworkToolbox import create_layer_q4, assign_layers_to_tensors
+from LEGO_HQEC.OperatorPush.TensorToolbox import (ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor,
+                                                  has_logical)
 
 
-def setup_max_rate_xzzxf(R):
+def setup_max_rate_scf(R):
     if type(R) is not int:
         raise ValueError("R is not int")
     elif R < 0:
@@ -32,26 +33,26 @@ def setup_max_rate_xzzxf(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define UPS generators
-    UPSa1 = 'IXXIZI'
-    UPSa2 = 'XIIXZI'
-    UPSa3 = 'IZIZXI'
-    UPSa4 = 'ZIZIXI'
+    UPSa1 = 'IXXIXI'
+    UPSa2 = 'XIIXXI'
+    UPSa3 = 'IZIZZI'
+    UPSa4 = 'ZIZIZI'
     UPSa5 = 'IXIXIX'
     UPSa6 = 'ZIIZIZ'
 
-    UPSb1 = 'IXXIZI'
-    UPSb2 = 'XIIXZI'
-    UPSb3 = 'IZIZXI'
-    UPSb4 = 'ZIZIXI'
+    UPSb1 = 'IXXIXI'
+    UPSb2 = 'XIIXXI'
+    UPSb3 = 'IZIZZI'
+    UPSb4 = 'ZIZIZI'
     UPSb5 = 'IXIXIX'
-    UPSb6 = 'IIZZXZ'
+    UPSb6 = 'IIZZZZ'
 
-    UPSc1 = 'IXXIZI'
-    UPSc2 = 'XIIXZI'
-    UPSc3 = 'IZIZXI'
-    UPSc4 = 'ZIZIXI'
-    UPSc5 = 'IIXXZX'
-    UPSc6 = 'IIZZXZ'
+    UPSc1 = 'IXXIXI'
+    UPSc2 = 'XIIXXI'
+    UPSc3 = 'IZIZZI'
+    UPSc4 = 'ZIZIZI'
+    UPSc5 = 'IIXXXX'
+    UPSc6 = 'IIZZZZ'
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -83,7 +84,7 @@ def setup_max_rate_xzzxf(R):
     return tensor_list
 
 
-def setup_zero_rate_xzzxf(R):
+def setup_zero_rate_scf(R):
     if type(R) is not int:
         raise ValueError("R is not int")
     elif R < 0:
@@ -117,33 +118,33 @@ def setup_zero_rate_xzzxf(R):
     assign_layers_to_tensors(tensor_list=tensor_list, center_tensor_id=0)
 
     # Define UPS generators
-    UPSa1 = 'IXXIZI'
-    UPSa2 = 'XIIXZI'
-    UPSa3 = 'IZIZXI'
-    UPSa4 = 'ZIZIXI'
+    UPSa1 = 'IXXIXI'
+    UPSa2 = 'XIIXXI'
+    UPSa3 = 'IZIZZI'
+    UPSa4 = 'ZIZIZI'
     UPSa5 = 'IXIXIX'
     UPSa6 = 'ZIIZIZ'
 
-    UPSb1 = 'IXXIZI'
-    UPSb2 = 'XIIXZI'
-    UPSb3 = 'IZIZXI'
-    UPSb4 = 'ZIZIXI'
+    UPSb1 = 'IXXIXI'
+    UPSb2 = 'XIIXXI'
+    UPSb3 = 'IZIZZI'
+    UPSb4 = 'ZIZIZI'
     UPSb5 = 'IXIXIX'
-    UPSb6 = 'IIZZXZ'
+    UPSb6 = 'IIZZZZ'
 
-    UPSc1 = 'IXXIZI'
-    UPSc2 = 'XIIXZI'
-    UPSc3 = 'IZIZXI'
-    UPSc4 = 'ZIZIXI'
-    UPSc5 = 'IIXXZX'
-    UPSc6 = 'IIZZXZ'
+    UPSc1 = 'IXXIXI'
+    UPSc2 = 'XIIXXI'
+    UPSc3 = 'IZIZZI'
+    UPSc4 = 'ZIZIZI'
+    UPSc5 = 'IIXXXX'
+    UPSc6 = 'IIZZZZ'
 
-    UPSd1 = 'IIXXIZ'
-    UPSd2 = 'IXIIXZ'
-    UPSd3 = 'IIZIZX'
-    UPSd4 = 'IZIZIX'
+    UPSd1 = 'IIXXIX'
+    UPSd2 = 'IXIIXX'
+    UPSd3 = 'IIZIZZ'
+    UPSd4 = 'IZIZIZ'
     UPSd5 = 'XIXIXI'
-    UPSd6 = 'ZIIZZX'
+    UPSd6 = 'ZIIZZZ'
 
     # Assign UPS to tensors
     for tensor in tensor_list:
@@ -158,6 +159,7 @@ def setup_zero_rate_xzzxf(R):
             tensor.stabilizer_list = [UPSa1, UPSa2, UPSa3, UPSa4]
             tensor.logical_z_list = [UPSa6]
             tensor.logical_x_list = [UPSa5]
+            tensor.all_ups = [UPSa1, UPSa2, UPSa3, UPSa4, UPSa5, UPSa6]
         elif any(neighbor_layer < current_layer for neighbor_layer in neighbor_layers):
             upper_neighbors = [layer for layer in neighbor_layers if layer < current_layer]
             if len(upper_neighbors) == 1:
@@ -167,10 +169,12 @@ def setup_zero_rate_xzzxf(R):
                     tensor.stabilizer_list = [UPSb1, UPSb3]
                     tensor.logical_z_list = [UPSb6]
                     tensor.logical_x_list = [UPSb5]
+                    tensor.all_ups = [UPSb1, UPSb2, UPSb3, UPSb4, UPSb5, UPSb6]
                 else:
                     # Rule 2.2
                     tensor.ups_list = [UPSd1, UPSd2, UPSd3, UPSd4, UPSd5, UPSd6]
                     tensor.stabilizer_list = [UPSd1, UPSd2, UPSd3, UPSd4]
+                    tensor.all_ups = [UPSd1, UPSd2, UPSd3, UPSd4, UPSd5, UPSd6]
             elif len(upper_neighbors) == 2:
                 if has_logical(tensor):
                     # Rule 3.1
@@ -178,8 +182,10 @@ def setup_zero_rate_xzzxf(R):
                     tensor.stabilizer_list = []
                     tensor.logical_z_list = [UPSc6]
                     tensor.logical_x_list = [UPSc5]
+                    tensor.all_ups = [UPSc1, UPSc2, UPSc3, UPSc4, UPSc5, UPSc6]
                 else:
                     # Rule 3.2
                     tensor.ups_list = [UPSd1, UPSd2, UPSd3, UPSd4, UPSd5, UPSd6]
                     tensor.stabilizer_list = [UPSd1, UPSd3]
+                    tensor.all_ups = [UPSd1, UPSd2, UPSd3, UPSd4, UPSd5, UPSd6]
     return tensor_list

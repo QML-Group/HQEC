@@ -1,5 +1,5 @@
-from OperatorPush.NetworkToolbox import create_layer_q4, assign_layers_to_tensors
-from OperatorPush.TensorToolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor, has_logical
+from LEGO_HQEC.OperatorPush.NetworkToolbox import create_layer_q4, assign_layers_to_tensors
+from LEGO_HQEC.OperatorPush.TensorToolbox import ensure_minimum_legs, add_logical_legs, get_tensor_from_id, Tensor
 
 
 def setup_zero_rate_qrm(R):

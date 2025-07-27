@@ -1,10 +1,12 @@
-from OperatorPush.HypertilingCompatibility.SRG_to_HTN import share_common_edge, get_shared_edge_neighbors, \
-    generate_tiling_with_layers, create_directed_polygons, generate_poly_id_mapping, has_only_left_right_neighbors, \
-    has_only_all_front_neighbors, has_any_neighbor, generate_tensor_with_legs, generate_tensors_for_all_polys, \
-    update_all_tensor_connections, swap_legs_for_same_layer_neighbor
-from hypertiling import HyperbolicTiling
-from OperatorPush.NetworkToolbox import assign_layers_to_tensors
-from OperatorPush.TensorToolbox import add_logical_legs, traverse_h_gate, get_tensor_from_id, swap_tensor_legs, Tensor
+from LEGO_HQEC.OperatorPush.HypertilingCompatibility.SRG_to_HTN import (generate_tiling_with_layers,
+                                                                        create_directed_polygons,
+                                                                        generate_poly_id_mapping,
+                                                                        generate_tensors_for_all_polys,
+                                                                        update_all_tensor_connections,
+                                                                        swap_legs_for_same_layer_neighbor)
+from LEGO_HQEC.OperatorPush.NetworkToolbox import assign_layers_to_tensors
+from LEGO_HQEC.OperatorPush.TensorToolbox import (add_logical_legs, traverse_h_gate, get_tensor_from_id,
+                                                  swap_tensor_legs, Tensor)
 
 
 def setup_htn(l):

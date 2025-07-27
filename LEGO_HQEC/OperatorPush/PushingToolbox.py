@@ -1,6 +1,6 @@
 import logging
 import copy
-from OperatorPush.TensorToolbox import read_out_boundary, read_out_logical, collect_connected_leg_operators, \
+from LEGO_HQEC.OperatorPush.TensorToolbox import read_out_boundary, read_out_logical, collect_connected_leg_operators, \
     unblock_children_legs, write_layer, get_tensor_from_id
 import csv
 import multiprocessing

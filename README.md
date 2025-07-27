@@ -1,6 +1,6 @@
-# HQEC
+# LEGO_HQEC
 
-HQEC is designed to accelerate research efficiency in holographic quantum error-correcting codes. The software
+LEGO_HQEC is designed to accelerate research efficiency in holographic quantum error-correcting codes. The software
 implements some operations on a holographic tile:
 
 - Quantum-LEGO-based operator push program on a customizable holographic tile. 
@@ -12,8 +12,8 @@ The Operator push program is responsible for obtaining the stabilizer generators
 Some common holographic quantum error correction code tensor networks can be directly extracted from presets. For example, pushing the stabilizer generators and logical operators of the seed tensor of the zero rate HaPPY code to the boundary.
 
 ```python
-from OperatorPush.PushingToolbox import batch_push
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
+from LEGO_HQEC.OperatorPush.PushingToolbox import batch_push
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
 
 # Set the radius of the HaPPY code
 R = 2
@@ -35,11 +35,11 @@ The software provides 3 decoders for holographic quantum error correction codes:
 The erasure decoder can analyze the recoverability of logical information in a holographic quantum error correction code under a given quantum erasure error. An example of a Monte Carlo simulation based on the erasure decoder is as follows:
 
 ```python
-from QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
-from OperatorPush.PushingToolbox import batch_push, batch_push_multiprocessing
-from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
-from QuDec.OutputProcessor import save_results_to_csv
+from LEGO_HQEC.QuDec.ErasureDecoder import calculate_recovery_rates_for_p_range
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
+from LEGO_HQEC.OperatorPush.PushingToolbox import batch_push
+from LEGO_HQEC.QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from LEGO_HQEC.QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     # Examine the HaPPY code with radii R=0, 1, 2, and 3, respectively.
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         tensor_list = setup_zero_rate_happy(R=R)
 
         # Obtain the operators of the corresponding HaPPY code using the operator push function.
-        results_dict = batch_push_multiprocessing(tensor_list)
+        results_dict = batch_push(tensor_list)
 
         # Extract the stabilizer generators from the result dict using the built-in function and store them in a list.
         stabilizers = extract_stabilizers_from_result_dict(results_dict)
@@ -74,10 +74,10 @@ if __name__ == '__main__':
 The tensor network decoder can analyze the recoverability of logical information in a holographic quantum error correction code under a given Pauli quantum error. It has excellent decoding performance and is highly recommended. An example of a Monte Carlo simulation based on the tensor network decoder is as follows:
 
 ```python
-from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.HaPPY import setup_zero_rate_happy, setup_max_rate_happy
+from LEGO_HQEC.QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
 import numpy as np
-from QuDec.OutputProcessor import save_results_to_csv
+from LEGO_HQEC.QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     task_list = [(1 / 3, 1 / 3)]

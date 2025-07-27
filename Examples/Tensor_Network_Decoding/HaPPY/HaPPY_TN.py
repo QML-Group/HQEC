@@ -3,8 +3,6 @@ from OperatorPush.Presets.HaPPY import setup_zero_rate_happy
 import numpy as np
 from QuDec.OutputProcessor import save_results_to_csv
 
-import csv
-
 if __name__ == '__main__':
     task_list = [(1/3, 1/3)]
     for task in task_list:

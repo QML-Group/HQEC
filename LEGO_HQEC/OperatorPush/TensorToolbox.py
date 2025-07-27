@@ -1,4 +1,4 @@
-from OperatorPush.OperatorToolbox import pauli_product, traverse_ups_powers, pauli_flip
+from LEGO_HQEC.OperatorPush.OperatorToolbox import pauli_product, traverse_ups_powers, pauli_flip
 import logging
 
 # Config logging
@@ -721,3 +721,19 @@ def swap_tensor_legs(tensor, leg_index_1, leg_index_2, tensor_list):
 
 # Example usage:
 # swap_tensor_legs(tensor_to_modify, 0, 1, tensor_list)
+
+
+def has_logical(tensor):
+    """
+    Check if any leg of the given tensor has the attribute 'logical' set to True.
+
+    Args:
+    tensor (Tensor): The tensor to check.
+
+    Returns:
+    bool: True if any leg of the tensor has 'logical' set to True, False otherwise.
+    """
+    for leg in tensor.legs:
+        if leg.logical:  # If the 'logical' attribute of the leg is True
+            return True
+    return False

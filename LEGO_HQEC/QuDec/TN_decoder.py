@@ -1,11 +1,12 @@
 import numpy as np
-from OperatorPush.PushingToolbox import batch_push
-from OperatorPush.OperatorToolbox import traverse_ups_powers
-from QuDec.OperatorProcessor import pauli_to_binary_vector
-from QuDec.PauliDecoder import (generate_pauli_error_vector, calculate_syndrome, batch_convert_to_binary_vectors,
-                                create_f, binary_vector_to_pauli, apply_mod2_sum, is_error_equivalent)
-from QuDec.Mod2Algebra import mod2_matrix_multiply
-from QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
+from LEGO_HQEC.OperatorPush.PushingToolbox import batch_push
+from LEGO_HQEC.OperatorPush.OperatorToolbox import traverse_ups_powers
+from LEGO_HQEC.QuDec.OperatorProcessor import pauli_to_binary_vector
+from LEGO_HQEC.QuDec.PauliDecoder import (generate_pauli_error_vector, calculate_syndrome,
+                                          batch_convert_to_binary_vectors, create_f, binary_vector_to_pauli,
+                                          apply_mod2_sum, is_error_equivalent)
+from LEGO_HQEC.QuDec.Mod2Algebra import mod2_matrix_multiply
+from LEGO_HQEC.QuDec.InputProcessor import extract_stabilizers_from_result_dict, extract_logicals_from_result_dict
 import tensornetwork as tn
 import psutil
 import os
