@@ -1,5 +1,5 @@
 from hypertiling import HyperbolicTiling
-from OperatorPush.TensorToolbox import TensorLeg, Tensor, get_tensor_from_id, swap_tensor_legs
+from LEGO_HQEC.OperatorPush.TensorToolbox import TensorLeg, Tensor, get_tensor_from_id, swap_tensor_legs
 
 
 def generate_tiling_with_layers(p, q, n):
