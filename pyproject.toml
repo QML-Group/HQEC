@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lego-hqec"
+version = "0.1.0"
+authors = [
+    {name = "Junyu Fan", email = "fzhjerry@gmail.com"},
+    {name = "Matthew Steinberg", email = "matt.steinberg3@gmail.com"},
+]
+description = "A package for accelerating holographic quantum error-correcting codes research"
+readme = "README.md"
+license = "LICENSE.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.21",
+    "gurobipy>=10.0",
+    "tensornetwork>=0.4",
+    "hypertiling>=1.2",
+    "psutil>=5.8",
+    "galois>=0.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/QML-Group/HQEC"
+Repository = "https://github.com/QML-Group/HQEC"
