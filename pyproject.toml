@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lego-hqec"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     {name = "Junyu Fan", email = "fzhjerry@gmail.com"},
     {name = "Matthew Steinberg", email = "matt.steinberg3@gmail.com"},
@@ -26,8 +26,10 @@ dependencies = [
     "galois>=0.3",
 ]
 
-[tool.setuptools]
-packages = ["LEGO_HQEC"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["LEGO_HQEC*"]
+exclude = []
 
 [project.urls]
 Homepage = "https://github.com/QML-Group/HQEC"
