@@ -11,7 +11,7 @@ authors = [
 ]
 description = "A package for accelerating holographic quantum error-correcting codes research"
 readme = "README.md"
-license = "LICENSE.md"
+license = "Apache-2.0"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -25,6 +25,9 @@ dependencies = [
     "psutil>=5.8",
     "galois>=0.3",
 ]
+
+[tool.setuptools]
+packages = ["LEGO_HQEC"]
 
 [project.urls]
 Homepage = "https://github.com/QML-Group/HQEC"
