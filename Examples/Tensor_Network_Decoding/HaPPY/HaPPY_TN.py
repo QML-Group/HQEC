@@ -1,17 +1,14 @@
-from QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
-from OperatorPush.Presets.Zero_Rate_HaPPY_new_for_kj import setup_zero_rate_happy, setup_max_rate_happy
+from LEGO_HQEC.QuDec.TN_decoder import tn_quantum_error_correction_decoder_multiprocess
+from LEGO_HQEC.OperatorPush.Presets.HaPPY_code import setup_zero_rate_happy
 import numpy as np
-from QuDec.OutputProcessor import save_results_to_csv
-
-import csv
+from LEGO_HQEC.QuDec.OutputProcessor import save_results_to_csv
 
 if __name__ == '__main__':
     task_list = [(1/3, 1/3)]
     for task in task_list:
         rx, rz = task
         for R in [0, 1]:
-            # tensor_list = setup_zero_rate_happy(R=R)
-            tensor_list = setup_max_rate_happy(R=R)
+            tensor_list = setup_zero_rate_happy(R=R)
             p_depo_step = 0.01
             p_depo_start = 0.01
             p_depo_end = 0.55

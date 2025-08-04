@@ -1,0 +1,7 @@
+/shelf/
+/workspace.xml
+__pycache__/
+*.pyc
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
