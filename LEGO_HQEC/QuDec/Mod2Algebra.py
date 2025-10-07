@@ -67,18 +67,91 @@ def swap_and_mod2_multiply(A, B):
     return result
 
 
-def gf2_pinv(matrix):
-    matrix_gf2 = GF2(matrix)
-    m, n = matrix_gf2.shape
-    r = np.linalg.matrix_rank(matrix_gf2)
+def gf2_matrix_inverse(A):
+    """
+    Compute the inverse of a square matrix over GF(2) using Gauss–Jordan elimination.
+    A must be shape (n, n). Raises if singular.
+    """
+    A = GF2(A)
+    n, m = A.shape
+    assert n == m, "Only square matrices can be inverted."
 
-    if r < min(m, n):
-        raise np.linalg.LinAlgError(
-            "Matrix is singular and cannot be inverted."
-        )
+    # Build augmented matrix [A | I]
+    I = GF2.Identity(n)
+    aug = np.concatenate([A, I], axis=1)  # shape (n, 2n), FieldArray
 
-    if r == n:
-        return np.linalg.inv(matrix_gf2.T @ matrix_gf2) @ matrix_gf2.T
+    aug = aug.copy()  # ensure it's mutable
 
-    else:
-        return matrix_gf2.T @ np.linalg.inv(matrix_gf2 @ matrix_gf2.T)
+    # Gauss–Jordan elimination over GF(2)
+    row = 0
+    for col in range(n):
+        # Find a pivot row with aug[r, col] == 1
+        pivot = None
+        for r in range(row, n):
+            if aug[r, col] == 1:
+                pivot = r
+                break
+        if pivot is None:
+            raise np.linalg.LinAlgError("Matrix is not invertible over GF(2) (no pivot in a column).")
+        # Swap pivot row to the current row
+        if pivot != row:
+            aug[[pivot, row], :] = aug[[row, pivot], :]
+        # Zero out the column in all other rows (XOR in GF(2))
+        for r in range(n):
+            if r != row and aug[r, col] == 1:
+                aug[r, :] ^= aug[row, :]
+        row += 1
+        if row == n:
+            break
+
+    # Left block is now I; right block is A^{-1}
+    A_inv = aug[:, n:]
+    return A_inv
+
+
+def gf2_left_inverse_fast(A):
+    """
+    Construct a left inverse over GF(2).
+    A: (m, n), requires full column rank (rank = n, m >= n).
+    Returns L: (n, m) such that L @ A = I_n.
+    Single pass row-reduction recording row ops (R ∈ GF(2)^{m×m}); take the top n rows of R.
+    Complexity ~ O(m * n^2); no combinatorial search or matrix inversion.
+    """
+    A = GF2(A)                 # (m, n)
+    m, n = A.shape
+    R = GF2.Identity(m)        # Accumulates row operations
+
+    row = 0
+    for col in range(n):
+        # 1) Find a pivot row with A[row:, col] == 1
+        pivot = None
+        for r in range(row, m):
+            if A[r, col] == 1:
+                pivot = r
+                break
+        if pivot is None:
+            # No pivot in this column → not full column rank
+            continue
+
+        # 2) Swap pivot row to current 'row'
+        if pivot != row:
+            A[[row, pivot], :] = A[[pivot, row], :]
+            R[[row, pivot], :] = R[[pivot, row], :]
+
+        # 3) Eliminate this column in all other rows (XOR in GF(2))
+        for r in range(m):
+            if r != row and A[r, col] == 1:
+                A[r, :] ^= A[row, :]
+                R[r, :] ^= R[row, :]
+
+        row += 1
+        if row == n:
+            break
+
+    if row < n:
+        raise np.linalg.LinAlgError("A has insufficient column rank over GF(2) (rank < n); cannot construct a left inverse.")
+
+    # Now R @ (original A) = [I_n; 0]. The top n rows of R form the left inverse.
+    L = R[:n, :]               # (n, m)
+    return L
+
