@@ -2,12 +2,13 @@ from gurobipy import GRB, Model, or_, and_
 import random
 from LEGO_HQEC.QuDec.Mod2Algebra import mod2_matrix_multiply, mod2_gaussian_elimination
 from LEGO_HQEC.QuDec.OperatorProcessor import batch_convert_to_binary_vectors, binary_vector_to_pauli, apply_mod2_sum
-from LEGO_HQEC.QuDec.Mod2Algebra import swap_and_mod2_multiply, gf2_pinv
+from LEGO_HQEC.QuDec.Mod2Algebra import swap_and_mod2_multiply, gf2_left_inverse_fast
 import numpy as np
 import os
 import psutil
 from multiprocessing import Process, Queue, Pool
 import math
+import galois
 
 
 def minimize_error_operator_weight(e, stabilizers_and_logical, time_limit=None, mip_focus=0, heuristics=0,
@@ -516,17 +517,21 @@ def filter_pauli_operator_list(A, B):
 def create_f(symplectic_stabilizers):
     if not isinstance(symplectic_stabilizers, list) or not symplectic_stabilizers:
         raise ValueError("Input must be a non-empty list.")
-
     for row in symplectic_stabilizers:
         if not isinstance(row, list):
             raise ValueError("Each row must be a list.")
 
-    n = int(len(symplectic_stabilizers[0])/2)
+    n = int(len(symplectic_stabilizers[0]) // 2)
+    I = np.eye(n, dtype=int)
+    Z = np.zeros((n, n), dtype=int)
+    lambda_matrix = np.block([[Z, I], [I, Z]])
 
-    identity_matrix = np.eye(n, dtype=int)
-    zeros_block = np.zeros((n, n), dtype=int)
-    lambda_matrix = np.block([[zeros_block, identity_matrix], [identity_matrix, zeros_block]])
-    s_lambda_matrix = lambda_matrix @ np.array(symplectic_stabilizers).T
-    f = gf2_pinv(s_lambda_matrix).T.tolist()
+    S = np.array(symplectic_stabilizers, dtype=int)      # (m, 2n)
+    s_lambda_matrix = lambda_matrix @ S.T                # (2n, m)
+    A = galois.GF(2)(s_lambda_matrix)
 
+    # In typical symplectic–stabilizer derivations, a left inverse is required.
+    # Requires rank(A) = 2n (full column rank).
+    L = gf2_left_inverse_fast(A)                         # (n, m) with L @ A = I_n
+    f = L.T.tolist()
     return f
